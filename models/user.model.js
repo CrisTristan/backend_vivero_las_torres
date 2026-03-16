@@ -37,7 +37,7 @@ class UserModel {
       .from('usuarios')
       .select('*')
       .eq('correo', this.correo)
-      .single();
+      .maybeSingle();
 
     if(error) {
       console.log("Error al obtener usuario por correo:", error);
@@ -51,7 +51,7 @@ class UserModel {
       .from('usuarios')
       .select('password_hashed')
       .eq('correo', this.correo)
-      .single();
+      .maybeSingle();
 
     if(error) {
       console.log("Error al obtener contraseña hash por correo:", error);

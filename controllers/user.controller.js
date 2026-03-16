@@ -1,6 +1,12 @@
 import UserModel from '../models/user.model.js';
 import bcrypt from 'bcrypt';
 
+function createHttpError(message, statusCode) {
+    const error = new Error(message);
+    error.statusCode = statusCode;
+    return error;
+}
+
 
 export default class UserController{
     constructor(nombre, apellidos, correo, password) {
@@ -21,7 +27,9 @@ export default class UserController{
 
     async getUserByEmail() {
         const user = new UserModel(null, null, this.correo, null);
+        // console.log("Obteniendo usuario por correo:", user.correo);
         const data = await user.getUserByEmail();
+        // console.log("Datos obtenidos por correo:", data);
         return data;
     }
 
@@ -37,15 +45,18 @@ export default class UserController{
 
     async login() {
         const userData = await this.getUserByEmail();
-        const userPasswordHashData = await this.getPasswordHashByEmail();
-        console.log("Datos del usuario:", userData);
-        console.log("Hash de la contraseña:", userPasswordHashData);
         if (!userData) {
-            throw new Error('Usuario no encontrado');
+            throw createHttpError('Usuario no encontrado', 404);
         }
+
+        const userPasswordHashData = await this.getPasswordHashByEmail();
+        // if (!userPasswordHashData) {
+        //     throw createHttpError('Usuario no encontrado', 404);
+        // }
+
         const isPasswordValid = await this.verifyPassword(this.password, userPasswordHashData.password_hashed);
         if (!isPasswordValid) {
-            throw new Error('Contraseña incorrecta');
+            throw createHttpError('Contraseña incorrecta', 401);
         }
         return userData;
     }

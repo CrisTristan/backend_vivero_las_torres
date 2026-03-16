@@ -5,6 +5,7 @@ import Stripe from 'stripe';
 import UserController from './controllers/user.controller.js';
 import OrderController from './controllers/order.controller.js';
 import OrderProductsController from './controllers/orderProducts.controller.js';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 app.use(cors());
@@ -89,7 +90,8 @@ app.post('/loginUser', async (req, res) => {
       user: data
     });
   } catch (error) {
-    res.status(401).send({ error: error.message });
+    const statusCode = error.statusCode || 500;
+    res.status(statusCode).send({ error: error.message });
   }
 });
 
