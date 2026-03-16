@@ -5,7 +5,13 @@ import Stripe from 'stripe';
 import UserController from './controllers/user.controller.js';
 import OrderController from './controllers/order.controller.js';
 import OrderProductsController from './controllers/orderProducts.controller.js';
-import jwt from 'jsonwebtoken';
+import {
+  signAccessToken,
+  signRefreshToken,
+  sanitizeUser,
+  verifyAccessToken,
+  verifyRefreshToken
+} from './Tokens/JsonWebTokens.js';
 
 const app = express();
 app.use(cors());
@@ -49,10 +55,19 @@ app.post('/registerUser', async (req, res) => {
 
     const user = new UserController(nombre, apellidos, correo, password);
     const data = await user.createUser();
+    const createdUser = Array.isArray(data) ? data[0] : data;
+    console.log("Usuario creado:", createdUser);
+    if (!createdUser) {
+      return res.status(500).json({ error: 'No se pudo crear el usuario' });
+    }
 
-    res.status(201).send({
-      message: 'Usuario registrado exitosamente',
-      user: data
+    const accessToken = signAccessToken(createdUser);
+    const refreshToken = signRefreshToken(createdUser);
+
+    return res.status(201).json({
+      user: sanitizeUser(createdUser),
+      accessToken,
+      refreshToken,
     });
 
   } catch (error) {
@@ -85,10 +100,16 @@ app.post('/loginUser', async (req, res) => {
     }
     const user = new UserController(null, null, correo, password);
     const data = await user.login();
-    res.send({
-      message: 'Inicio de sesión exitoso',
-      user: data
+    
+    const accessToken = signAccessToken(data);
+    const refreshToken = signRefreshToken(data);
+
+    return res.json({
+      user: sanitizeUser(data),
+      accessToken,
+      refreshToken,
     });
+
   } catch (error) {
     const statusCode = error.statusCode || 500;
     res.status(statusCode).send({ error: error.message });
@@ -140,5 +161,51 @@ app.get('/getOrdersByUserId', async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 });
+
+app.post('/refreshToken', async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) {
+    console.warn('[AUTH][REFRESH] Solicitud sin refresh token');
+    return res.status(401).json({ message: 'Refresh token requerido' });
+  }
+
+  try {
+    console.log('[AUTH][REFRESH] Intento de refresh recibido desde el frontend');
+    const payload = verifyRefreshToken(refreshToken);
+    console.log(`[AUTH][REFRESH] Token válido para usuario: ${payload.correo}`);
+
+    const userController = new UserController(null, null, payload.correo, null);
+    const user = await userController.getUserByEmail();
+
+    if (!user) {
+      console.warn(`[AUTH][REFRESH] Usuario no encontrado para correo: ${payload.correo}`);
+      return res.status(401).json({ message: 'Usuario inválido' });
+    }
+
+    const newAccessToken = signAccessToken(user);
+    console.log(`[AUTH][REFRESH] Nuevo access token generado para usuario: ${user.correo}`);
+    return res.json({ accessToken: newAccessToken });
+  } catch (error) {
+    console.error('[AUTH][REFRESH] Error al refrescar token:', error.message);
+    return res.status(401).json({ message: 'Refresh token inválido o expirado' });
+  }
+});
+
+// GET /me - Ruta protegida para obtener información del usuario autenticado
+app.get('/me', verifyAccessToken, async (req, res) => {
+  try {
+    const userController = new UserController(null, null, req.auth?.correo, null);
+    const user = await userController.getUserByEmail();
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    return res.json({ user: sanitizeUser(user) });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 
 app.listen(3000, () => console.log('Servidor en puerto 3000'));
