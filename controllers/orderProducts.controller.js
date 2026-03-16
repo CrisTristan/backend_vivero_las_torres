@@ -16,4 +16,14 @@ export default class OrderProductsController {
             throw new Error(`Error al crear el producto de la orden: ${error.message}`);
         }
     }
+
+    async getOrdersProductsByUserId() {
+        try {
+            const orderProducts = new OrderProductsModel(this.orden_id);
+            const ordersProductsList = await orderProducts.getOrdersProductsByUserId(this.orden_id);
+            return ordersProductsList;
+        } catch (error) {
+            throw new Error(`Error al obtener los productos de la orden: ${error.message}`);
+        }
+    }
 }

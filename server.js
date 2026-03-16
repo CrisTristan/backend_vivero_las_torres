@@ -163,6 +163,20 @@ app.get('/getOrdersByUserId', async (req, res) => {
   }
 });
 
+app.get('/getOrdersProductsByUserId', verifyAccessToken,async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    if (!user_id) {
+      return res.status(400).send({ error: 'El user_id es obligatorio' });
+    }
+    const order = new OrderProductsController(user_id);
+    const ordersList = await order.getOrdersProductsByUserId();
+    res.send({ ordersProducts: ordersList });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
 app.post('/refreshToken', async (req, res) => {
   const { refreshToken } = req.body;
   if (!refreshToken) {
