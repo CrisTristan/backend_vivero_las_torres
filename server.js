@@ -10,7 +10,8 @@ import {
   signRefreshToken,
   sanitizeUser,
   verifyAccessToken,
-  verifyRefreshToken
+  verifyRefreshToken,
+  verificarUserRoleAdmin
 } from './Tokens/JsonWebTokens.js';
 
 const app = express();
@@ -171,6 +172,7 @@ app.post('/refreshToken', async (req, res) => {
 
   try {
     console.log('[AUTH][REFRESH] Intento de refresh recibido desde el frontend');
+    //verificar el refresh token y obtener el correo del usuario
     const payload = verifyRefreshToken(refreshToken);
     console.log(`[AUTH][REFRESH] Token válido para usuario: ${payload.correo}`);
 
@@ -183,7 +185,7 @@ app.post('/refreshToken', async (req, res) => {
     }
 
     const newAccessToken = signAccessToken(user);
-    console.log(`[AUTH][REFRESH] Nuevo access token generado para usuario: ${user.correo}`);
+    console.log(`[AUTH][REFRESH] Nuevo access token generado para usuario: ${user.correo} de tipo refresh` );
     return res.json({ accessToken: newAccessToken });
   } catch (error) {
     console.error('[AUTH][REFRESH] Error al refrescar token:', error.message);
@@ -202,6 +204,24 @@ app.get('/me', verifyAccessToken, async (req, res) => {
     }
 
     return res.json({ user: sanitizeUser(user) });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+//verificar el rol del usuario para acceder a rutas administrativas
+//hacer la verificación con el token y el correo guardado en el token para obtener el usuario y verificar su rol
+app.get('/admin', verifyAccessToken, verificarUserRoleAdmin,async (req, res) => {
+  try {
+    const userController = new UserController(null, null, req.auth?.correo, null);
+    const user = await userController.getUserByEmail();
+    
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    
+    // El rol ya fue verificado por el middleware, no lo hagas de nuevo
+    return res.json({ message: 'Bienvenido, admin!', user: sanitizeUser(user) });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
