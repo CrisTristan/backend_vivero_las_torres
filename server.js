@@ -8,6 +8,13 @@ import OrderProductsController from './controllers/orderProducts.controller.js';
 import getAllPlantsRouter from './routes/Plants/getAllPlants.js';
 import createNewPlantRouter from './routes/Plants/createNewPlant.js';
 import updatePlantByIdRouter from './routes/Plants/updatePlantById.js';
+import createNewPotRouter from './routes/macetas/createNewPot.js';
+import createNewStoneRouter from './routes/piedras/createNewStone.js';
+import createNewGrassRouter from './routes/pasto/createNewGrass.js';
+import createNewHerbicideRouter from './routes/herbicidas/createNewHerbicide.js';
+import createNewPesticideRouter from './routes/plaguicidas/createNewPesticide.js';
+import createNewFertilizerRouter from './routes/fertilizantes/createNewFertilizer.js';
+import createNewSoilRouter from './routes/tierra/createNewSoil.js';
 import uploadImageCloudRouter from './routes/images/uploadImageCloud.js';
 import {
   signAccessToken,
@@ -24,6 +31,13 @@ app.use(express.json());
 app.use(getAllPlantsRouter);
 app.use(createNewPlantRouter);
 app.use(updatePlantByIdRouter);
+app.use(createNewPotRouter);
+app.use(createNewStoneRouter);
+app.use(createNewGrassRouter);
+app.use(createNewHerbicideRouter);
+app.use(createNewPesticideRouter);
+app.use(createNewFertilizerRouter);
+app.use(createNewSoilRouter);
 app.use(uploadImageCloudRouter);
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
