@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'dev_access_secret';
 const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'dev_refresh_secret';
-const ACCESS_EXPIRES = '2m'; // 2 minutos para pruebas, ajustar según necesidades
+const ACCESS_EXPIRES = '30m'; // 30 minutos para pruebas, ajustar según necesidades
 const REFRESH_EXPIRES = '7d';
 
 function signAccessToken(user) {

@@ -2,11 +2,12 @@ import { supabase } from "../database/supaBaseConnection.js";
 
 export default class OrderModel {
 
-  constructor(user_id, total, fecha, estado) {
+  constructor(user_id, total, fecha, estado, es_arreglo_personalizado) {
     this.user_id = user_id;
     this.total = total;
     this.fecha = fecha;
     this.estado = estado;
+    this.es_arreglo_personalizado = es_arreglo_personalizado;
   }
 
   async createOrder() {
@@ -16,7 +17,8 @@ export default class OrderModel {
         { 
             usuario_id: this.user_id,
             total: this.total,
-            estado: this.estado
+            estado: this.estado,
+            es_arreglo_personalizado: this.es_arreglo_personalizado,
         }
       ])
       .select();

@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "checkJs": false,
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": false,
+    "skipLibCheck": true
+  },
+  "include": [
+    "server.js",
+    "controllers/**/*.js",
+    "database/**/*.js",
+    "models/**/*.js",
+    "routes/**/*.js",
+    "Tokens/**/*.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

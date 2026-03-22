@@ -3,8 +3,12 @@ import express from 'express';
 import cors from 'cors';
 import Stripe from 'stripe';
 import UserController from './controllers/user.controller.js';
-import OrderController from './controllers/order.controller.js';
+import OrderController from './controllers/order/order.controller.js';
 import OrderProductsController from './controllers/orderProducts.controller.js';
+import getAllPlantsRouter from './routes/Plants/getAllPlants.js';
+import createNewPlantRouter from './routes/Plants/createNewPlant.js';
+import updatePlantByIdRouter from './routes/Plants/updatePlantById.js';
+import uploadImageCloudRouter from './routes/images/uploadImageCloud.js';
 import {
   signAccessToken,
   signRefreshToken,
@@ -17,6 +21,10 @@ import {
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(getAllPlantsRouter);
+app.use(createNewPlantRouter);
+app.use(updatePlantByIdRouter);
+app.use(uploadImageCloudRouter);
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
@@ -29,7 +37,7 @@ const stripe = new Stripe(stripeSecretKey);
 app.post('/create-payment-intent', async (req, res) => {
   try {
     const { amount} = req.body;
-
+    console.log("Monto recibido para crear PaymentIntent:", amount);
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount, // en centavos (ej: 1000 = $10.00)
       currency: 'mxn',
@@ -119,15 +127,15 @@ app.post('/loginUser', async (req, res) => {
 
 app.post('/createOrder', async (req, res) => {
   try {
-    const { usuario_id, total, estado, productos } = req.body;
-    console.log("Datos recibidos para crear orden:", { usuario_id, total, estado, productos });
+    const { usuario_id, total, estado, es_arreglo_personalizado,productos } = req.body;
+    console.log("Datos recibidos para crear orden:", { usuario_id, total, estado, es_arreglo_personalizado, productos });
     if (!usuario_id || !total || !estado) {
       return res.status(400).send({ error: 'Todos los campos son obligatorios' });
     }
     if(estado !== 'no entregado' && estado !== 'entregado') {
       return res.status(400).send({ error: 'El estado debe ser "no entregado" o "entregado"' });
     }
-    const order = new OrderController(usuario_id, total, null, estado);
+    const order = new OrderController(usuario_id, total, null, estado, es_arreglo_personalizado);
     const newOrder = await order.createOrder();
 
     // Guardar los productos de la orden
@@ -163,7 +171,7 @@ app.get('/getOrdersByUserId', async (req, res) => {
   }
 });
 
-app.get('/getOrdersProductsByUserId', verifyAccessToken,async (req, res) => {
+app.get('/getOrdersProductsByUserId',async (req, res) => {
   try {
     const { user_id } = req.query;
     if (!user_id) {
