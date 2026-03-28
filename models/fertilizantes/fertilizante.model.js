@@ -1,6 +1,24 @@
 import { supabase } from "../../database/supaBaseConnection.js";
 
 export default class FertilizanteModel {
+  async deleteFertilizanteById(fertilizanteId) {
+    const { data: fertilizante, error: fertilizanteError } = await supabase
+      .from("fertilizantes")
+      .select("id, producto_id")
+      .eq("id", fertilizanteId)
+      .maybeSingle();
+    if (fertilizanteError) throw new Error(`Error al buscar el fertilizante: ${fertilizanteError.message}`);
+    if (!fertilizante) return null;
+    const { error: deleteFertilizanteError } = await supabase
+      .from("fertilizantes")
+      .delete()
+      .eq("id", fertilizanteId);
+    if (deleteFertilizanteError) throw new Error(`Error al eliminar el fertilizante: ${deleteFertilizanteError.message}`);
+    if (fertilizante.producto_id) {
+      await supabase.from("productos").delete().eq("id", fertilizante.producto_id);
+    }
+    return true;
+  }
   async createNewFertilizer(payload) {
     const categoriaSeleccionada = payload.categoriaSeleccionada;
     const categoriaId =

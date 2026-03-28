@@ -1,6 +1,24 @@
 import { supabase } from "../../database/supaBaseConnection.js";
 
 export default class PastoModel {
+  async deletePastoById(pastoId) {
+    const { data: pasto, error: pastoError } = await supabase
+      .from("pasto")
+      .select("id, producto_id")
+      .eq("id", pastoId)
+      .maybeSingle();
+    if (pastoError) throw new Error(`Error al buscar el pasto: ${pastoError.message}`);
+    if (!pasto) return null;
+    const { error: deletePastoError } = await supabase
+      .from("pasto")
+      .delete()
+      .eq("id", pastoId);
+    if (deletePastoError) throw new Error(`Error al eliminar el pasto: ${deletePastoError.message}`);
+    if (pasto.producto_id) {
+      await supabase.from("productos").delete().eq("id", pasto.producto_id);
+    }
+    return true;
+  }
   async createNewGrass(payload) {
     const categoriaSeleccionada = payload.categoriaSeleccionada;
     const categoriaId =

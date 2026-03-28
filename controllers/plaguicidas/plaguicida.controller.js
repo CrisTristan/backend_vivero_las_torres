@@ -1,6 +1,14 @@
 import PlaguicidaModel from "../../models/plaguicidas/plaguicida.model.js";
 
 export default class PlaguicidaController {
+  async deletePlaguicidaById(plaguicidaId) {
+    try {
+      const plaguicidaModel = new PlaguicidaModel();
+      return await plaguicidaModel.deletePlaguicidaById(plaguicidaId);
+    } catch (error) {
+      throw new Error(`Error al eliminar el plaguicida: ${error.message}`);
+    }
+  }
   async createNewPesticide(payload) {
     try {
       const plaguicidaModel = new PlaguicidaModel();

@@ -1,6 +1,24 @@
 import { supabase } from "../../database/supaBaseConnection.js";
 
 export default class TierraModel {
+  async deleteTierraById(tierraId) {
+    const { data: tierra, error: tierraError } = await supabase
+      .from("tierra")
+      .select("id, producto_id")
+      .eq("id", tierraId)
+      .maybeSingle();
+    if (tierraError) throw new Error(`Error al buscar la tierra: ${tierraError.message}`);
+    if (!tierra) return null;
+    const { error: deleteTierraError } = await supabase
+      .from("tierra")
+      .delete()
+      .eq("id", tierraId);
+    if (deleteTierraError) throw new Error(`Error al eliminar la tierra: ${deleteTierraError.message}`);
+    if (tierra.producto_id) {
+      await supabase.from("productos").delete().eq("id", tierra.producto_id);
+    }
+    return true;
+  }
   async createNewSoil(payload) {
     const categoriaSeleccionada = payload.categoriaSeleccionada;
     const categoriaId =

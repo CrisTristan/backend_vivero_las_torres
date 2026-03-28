@@ -1,6 +1,24 @@
 import { supabase } from "../../database/supaBaseConnection.js";
 
 export default class PlaguicidaModel {
+  async deletePlaguicidaById(plaguicidaId) {
+    const { data: plaguicida, error: plaguicidaError } = await supabase
+      .from("plaguicidas")
+      .select("id, producto_id")
+      .eq("id", plaguicidaId)
+      .maybeSingle();
+    if (plaguicidaError) throw new Error(`Error al buscar el plaguicida: ${plaguicidaError.message}`);
+    if (!plaguicida) return null;
+    const { error: deletePlaguicidaError } = await supabase
+      .from("plaguicidas")
+      .delete()
+      .eq("id", plaguicidaId);
+    if (deletePlaguicidaError) throw new Error(`Error al eliminar el plaguicida: ${deletePlaguicidaError.message}`);
+    if (plaguicida.producto_id) {
+      await supabase.from("productos").delete().eq("id", plaguicida.producto_id);
+    }
+    return true;
+  }
   async createNewPesticide(payload) {
     const categoriaSeleccionada = payload.categoriaSeleccionada;
     const categoriaId =

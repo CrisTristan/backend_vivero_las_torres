@@ -1,6 +1,14 @@
 import FertilizanteModel from "../../models/fertilizantes/fertilizante.model.js";
 
 export default class FertilizanteController {
+  async deleteFertilizanteById(fertilizanteId) {
+    try {
+      const fertilizanteModel = new FertilizanteModel();
+      return await fertilizanteModel.deleteFertilizanteById(fertilizanteId);
+    } catch (error) {
+      throw new Error(`Error al eliminar el fertilizante: ${error.message}`);
+    }
+  }
   async createNewFertilizer(payload) {
     try {
       const fertilizanteModel = new FertilizanteModel();

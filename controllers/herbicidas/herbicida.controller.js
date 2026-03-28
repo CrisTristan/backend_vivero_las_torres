@@ -1,6 +1,14 @@
 import HerbicidaModel from "../../models/herbicidas/herbicida.model.js";
 
 export default class HerbicidaController {
+  async deleteHerbicidaById(herbicidaId) {
+    try {
+      const herbicidaModel = new HerbicidaModel();
+      return await herbicidaModel.deleteHerbicidaById(herbicidaId);
+    } catch (error) {
+      throw new Error(`Error al eliminar el herbicida: ${error.message}`);
+    }
+  }
   async createNewHerbicide(payload) {
     try {
       const herbicidaModel = new HerbicidaModel();

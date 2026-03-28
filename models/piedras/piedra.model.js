@@ -1,6 +1,24 @@
 import { supabase } from "../../database/supaBaseConnection.js";
 
 export default class PiedraModel {
+  async deletePiedraById(piedraId) {
+    const { data: piedra, error: piedraError } = await supabase
+      .from("piedras")
+      .select("id, producto_id")
+      .eq("id", piedraId)
+      .maybeSingle();
+    if (piedraError) throw new Error(`Error al buscar la piedra: ${piedraError.message}`);
+    if (!piedra) return null;
+    const { error: deletePiedraError } = await supabase
+      .from("piedras")
+      .delete()
+      .eq("id", piedraId);
+    if (deletePiedraError) throw new Error(`Error al eliminar la piedra: ${deletePiedraError.message}`);
+    if (piedra.producto_id) {
+      await supabase.from("productos").delete().eq("id", piedra.producto_id);
+    }
+    return true;
+  }
   async createNewStone(payload) {
     const categoriaSeleccionada = payload.categoriaSeleccionada;
     const categoriaId =

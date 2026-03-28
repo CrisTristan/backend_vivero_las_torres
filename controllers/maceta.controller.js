@@ -1,6 +1,14 @@
 import MacetaModel from "../models/maceta.model.js";
 
 export default class MacetaController {
+  async deleteMacetaById(macetaId) {
+    try {
+      const macetaModel = new MacetaModel();
+      return await macetaModel.deleteMacetaById(macetaId);
+    } catch (error) {
+      throw new Error(`Error al eliminar la maceta: ${error.message}`);
+    }
+  }
   async createNewPot(payload) {
     try {
       const macetaModel = new MacetaModel();

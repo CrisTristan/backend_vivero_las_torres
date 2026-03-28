@@ -1,6 +1,24 @@
 import { supabase } from "../../database/supaBaseConnection.js";
 
 export default class HerbicidaModel {
+  async deleteHerbicidaById(herbicidaId) {
+    const { data: herbicida, error: herbicidaError } = await supabase
+      .from("herbicidas")
+      .select("id, producto_id")
+      .eq("id", herbicidaId)
+      .maybeSingle();
+    if (herbicidaError) throw new Error(`Error al buscar el herbicida: ${herbicidaError.message}`);
+    if (!herbicida) return null;
+    const { error: deleteHerbicidaError } = await supabase
+      .from("herbicidas")
+      .delete()
+      .eq("id", herbicidaId);
+    if (deleteHerbicidaError) throw new Error(`Error al eliminar el herbicida: ${deleteHerbicidaError.message}`);
+    if (herbicida.producto_id) {
+      await supabase.from("productos").delete().eq("id", herbicida.producto_id);
+    }
+    return true;
+  }
   async createNewHerbicide(payload) {
     const categoriaSeleccionada = payload.categoriaSeleccionada;
     const categoriaId =

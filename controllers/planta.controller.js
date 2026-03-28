@@ -1,6 +1,14 @@
 import PlantaModel from "../models/planta.model.js";
 
 export default class PlantaController {
+  async deletePlantById(plantId) {
+    try {
+      const plantaModel = new PlantaModel();
+      return await plantaModel.deletePlantById(plantId);
+    } catch (error) {
+      throw new Error(`Error al eliminar la planta: ${error.message}`);
+    }
+  }
   async getAllPlantsWithProducts() {
     try {
       const plantaModel = new PlantaModel();

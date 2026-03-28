@@ -1,6 +1,27 @@
 import { supabase } from "../database/supaBaseConnection.js";
 
 export default class PlantaModel {
+  async deletePlantById(plantId) {
+    // Buscar la planta y su producto_id
+    const { data: plant, error: plantError } = await supabase
+      .from("plantas")
+      .select("id, producto_id")
+      .eq("id", plantId)
+      .maybeSingle();
+    if (plantError) throw new Error(`Error al buscar la planta: ${plantError.message}`);
+    if (!plant) return null;
+    // Eliminar la planta
+    const { error: deletePlantError } = await supabase
+      .from("plantas")
+      .delete()
+      .eq("id", plantId);
+    if (deletePlantError) throw new Error(`Error al eliminar la planta: ${deletePlantError.message}`);
+    // Eliminar el producto relacionado
+    if (plant.producto_id) {
+      await supabase.from("productos").delete().eq("id", plant.producto_id);
+    }
+    return true;
+  }
   async getAllPlantsWithProducts() {
     const { data, error } = await supabase
       .from("plantas")

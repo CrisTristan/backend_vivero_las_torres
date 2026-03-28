@@ -1,6 +1,24 @@
 import { supabase } from "../database/supaBaseConnection.js";
 
 export default class MacetaModel {
+  async deleteMacetaById(macetaId) {
+    const { data: maceta, error: macetaError } = await supabase
+      .from("macetas")
+      .select("id, producto_id")
+      .eq("id", macetaId)
+      .maybeSingle();
+    if (macetaError) throw new Error(`Error al buscar la maceta: ${macetaError.message}`);
+    if (!maceta) return null;
+    const { error: deleteMacetaError } = await supabase
+      .from("macetas")
+      .delete()
+      .eq("id", macetaId);
+    if (deleteMacetaError) throw new Error(`Error al eliminar la maceta: ${deleteMacetaError.message}`);
+    if (maceta.producto_id) {
+      await supabase.from("productos").delete().eq("id", maceta.producto_id);
+    }
+    return true;
+  }
   async createNewPot(payload) {
     const categoriaSeleccionada = payload.categoriaSeleccionada;
     const categoriaId =

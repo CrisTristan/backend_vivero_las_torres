@@ -1,6 +1,14 @@
 import PiedraModel from "../../models/piedras/piedra.model.js";
 
 export default class PiedraController {
+  async deletePiedraById(piedraId) {
+    try {
+      const piedraModel = new PiedraModel();
+      return await piedraModel.deletePiedraById(piedraId);
+    } catch (error) {
+      throw new Error(`Error al eliminar la piedra: ${error.message}`);
+    }
+  }
   async createNewStone(payload) {
     try {
       const piedraModel = new PiedraModel();

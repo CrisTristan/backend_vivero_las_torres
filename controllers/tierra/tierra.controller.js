@@ -1,6 +1,14 @@
 import TierraModel from "../../models/tierra/tierra.model.js";
 
 export default class TierraController {
+  async deleteTierraById(tierraId) {
+    try {
+      const tierraModel = new TierraModel();
+      return await tierraModel.deleteTierraById(tierraId);
+    } catch (error) {
+      throw new Error(`Error al eliminar la tierra: ${error.message}`);
+    }
+  }
   async createNewSoil(payload) {
     try {
       const tierraModel = new TierraModel();
