@@ -66,4 +66,104 @@ export default class PastoModel {
 
     return createdGrass;
   }
+
+  async updatePastoById(pastoId, pastoData) {
+    const { data: existingPasto, error: existingPastoError } = await supabase
+      .from("pasto")
+      .select("id, producto_id")
+      .eq("id", pastoId)
+      .maybeSingle();
+
+    if (existingPastoError) {
+      throw new Error(`Error al obtener el pasto: ${existingPastoError.message}`);
+    }
+
+    if (!existingPasto) {
+      return null;
+    }
+
+    const allowedPastoFields = ["descripcion", "producto_id", "tipo", "nivel_cuidado"];
+    const pastoUpdates = {};
+
+    for (const field of allowedPastoFields) {
+      if (pastoData[field] !== undefined) {
+        pastoUpdates[field] = pastoData[field];
+      }
+    }
+
+    if (pastoUpdates.descripcion !== undefined) {
+      if (typeof pastoUpdates.descripcion === "string") {
+        pastoUpdates.descripcion = { descripcion: pastoUpdates.descripcion };
+      } else if (typeof pastoUpdates.descripcion === "object") {
+        const normalizedDescription = pastoUpdates.descripcion?.descripcion;
+        pastoUpdates.descripcion = {
+          descripcion:
+            normalizedDescription === undefined
+              ? ""
+              : String(normalizedDescription),
+        };
+      }
+    }
+
+    if (Object.keys(pastoUpdates).length > 0) {
+      const { error: updatePastoError } = await supabase
+        .from("pasto")
+        .update(pastoUpdates)
+        .eq("id", pastoId);
+
+      if (updatePastoError) {
+        throw new Error(`Error al actualizar el pasto: ${updatePastoError.message}`);
+      }
+    }
+
+    const productPayload = pastoData.productos || pastoData.producto;
+    const allowedProductFields = ["nombre", "precio", "imagen", "categoria_id", "stock"];
+    const productUpdates = {};
+
+    if (productPayload && typeof productPayload === "object") {
+      for (const field of allowedProductFields) {
+        if (productPayload[field] !== undefined) {
+          productUpdates[field] = productPayload[field];
+        }
+      }
+
+      if (productPayload.categorias?.id !== undefined) {
+        productUpdates.categoria_id = productPayload.categorias.id;
+      }
+    }
+
+    const resolvedProductId =
+      pastoUpdates.producto_id ?? productPayload?.id ?? existingPasto.producto_id;
+
+    if (Object.keys(productUpdates).length > 0) {
+      if (!resolvedProductId) {
+        throw new Error(
+          "No se encontró producto_id para actualizar los datos del producto.",
+        );
+      }
+
+      const { error: updateProductError } = await supabase
+        .from("productos")
+        .update(productUpdates)
+        .eq("id", resolvedProductId);
+
+      if (updateProductError) {
+        throw new Error(`Error al actualizar el producto: ${updateProductError.message}`);
+      }
+    }
+
+    const { data: updatedPasto, error: updatedPastoError } = await supabase
+      .from("pasto")
+      .select(
+        "id, descripcion, producto_id, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+      )
+      .eq("id", pastoId)
+      .maybeSingle();
+
+    if (updatedPastoError) {
+      throw new Error(`Error al obtener el pasto actualizado: ${updatedPastoError.message}`);
+    }
+
+    return updatedPasto;
+  }
 }

@@ -10,4 +10,14 @@ export default class MacetaController {
       throw new Error(`Error al crear la maceta: ${error.message}`);
     }
   }
+
+  async updateMacetaById(macetaId, macetaData) {
+    try {
+      const macetaModel = new MacetaModel();
+      const updatedPot = await macetaModel.updateMacetaById(macetaId, macetaData);
+      return updatedPot;
+    } catch (error) {
+      throw new Error(`Error al actualizar la maceta: ${error.message}`);
+    }
+  }
 }

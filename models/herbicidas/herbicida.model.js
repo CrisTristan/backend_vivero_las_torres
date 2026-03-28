@@ -66,4 +66,108 @@ export default class HerbicidaModel {
 
     return createdHerbicide;
   }
+
+  async updateHerbicidaById(herbicidaId, herbicidaData) {
+    const { data: existingHerbicida, error: existingHerbicidaError } = await supabase
+      .from("herbicidas")
+      .select("id, producto_id")
+      .eq("id", herbicidaId)
+      .maybeSingle();
+
+    if (existingHerbicidaError) {
+      throw new Error(`Error al obtener el herbicida: ${existingHerbicidaError.message}`);
+    }
+
+    if (!existingHerbicida) {
+      return null;
+    }
+
+    const allowedHerbicidaFields = ["descripcion", "producto_id"];
+    const herbicidaUpdates = {};
+
+    for (const field of allowedHerbicidaFields) {
+      if (herbicidaData[field] !== undefined) {
+        herbicidaUpdates[field] = herbicidaData[field];
+      }
+    }
+
+    if (herbicidaUpdates.descripcion !== undefined) {
+      if (typeof herbicidaUpdates.descripcion === "string") {
+        herbicidaUpdates.descripcion = { descripcion: herbicidaUpdates.descripcion };
+      } else if (typeof herbicidaUpdates.descripcion === "object") {
+        const normalizedDescription = herbicidaUpdates.descripcion?.descripcion;
+        herbicidaUpdates.descripcion = {
+          descripcion:
+            normalizedDescription === undefined
+              ? ""
+              : String(normalizedDescription),
+        };
+      }
+    }
+
+    if (Object.keys(herbicidaUpdates).length > 0) {
+      const { error: updateHerbicidaError } = await supabase
+        .from("herbicidas")
+        .update(herbicidaUpdates)
+        .eq("id", herbicidaId);
+
+      if (updateHerbicidaError) {
+        throw new Error(
+          `Error al actualizar el herbicida: ${updateHerbicidaError.message}`,
+        );
+      }
+    }
+
+    const productPayload = herbicidaData.productos || herbicidaData.producto;
+    const allowedProductFields = ["nombre", "precio", "imagen", "categoria_id", "stock"];
+    const productUpdates = {};
+
+    if (productPayload && typeof productPayload === "object") {
+      for (const field of allowedProductFields) {
+        if (productPayload[field] !== undefined) {
+          productUpdates[field] = productPayload[field];
+        }
+      }
+
+      if (productPayload.categorias?.id !== undefined) {
+        productUpdates.categoria_id = productPayload.categorias.id;
+      }
+    }
+
+    const resolvedProductId =
+      herbicidaUpdates.producto_id ?? productPayload?.id ?? existingHerbicida.producto_id;
+
+    if (Object.keys(productUpdates).length > 0) {
+      if (!resolvedProductId) {
+        throw new Error(
+          "No se encontró producto_id para actualizar los datos del producto.",
+        );
+      }
+
+      const { error: updateProductError } = await supabase
+        .from("productos")
+        .update(productUpdates)
+        .eq("id", resolvedProductId);
+
+      if (updateProductError) {
+        throw new Error(`Error al actualizar el producto: ${updateProductError.message}`);
+      }
+    }
+
+    const { data: updatedHerbicida, error: updatedHerbicidaError } = await supabase
+      .from("herbicidas")
+      .select(
+        "id, descripcion, producto_id, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+      )
+      .eq("id", herbicidaId)
+      .maybeSingle();
+
+    if (updatedHerbicidaError) {
+      throw new Error(
+        `Error al obtener el herbicida actualizado: ${updatedHerbicidaError.message}`,
+      );
+    }
+
+    return updatedHerbicida;
+  }
 }

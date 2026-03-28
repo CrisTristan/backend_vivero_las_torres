@@ -67,4 +67,104 @@ export default class PiedraModel {
 
     return createdStone;
   }
+
+  async updatePiedraById(piedraId, piedraData) {
+    const { data: existingPiedra, error: existingPiedraError } = await supabase
+      .from("piedras")
+      .select("id, producto_id")
+      .eq("id", piedraId)
+      .maybeSingle();
+
+    if (existingPiedraError) {
+      throw new Error(`Error al obtener la piedra: ${existingPiedraError.message}`);
+    }
+
+    if (!existingPiedra) {
+      return null;
+    }
+
+    const allowedPiedraFields = ["descripcion", "producto_id", "esPiedraSuelta"];
+    const piedraUpdates = {};
+
+    for (const field of allowedPiedraFields) {
+      if (piedraData[field] !== undefined) {
+        piedraUpdates[field] = piedraData[field];
+      }
+    }
+
+    if (piedraUpdates.descripcion !== undefined) {
+      if (typeof piedraUpdates.descripcion === "string") {
+        piedraUpdates.descripcion = { descripcion: piedraUpdates.descripcion };
+      } else if (typeof piedraUpdates.descripcion === "object") {
+        const normalizedDescription = piedraUpdates.descripcion?.descripcion;
+        piedraUpdates.descripcion = {
+          descripcion:
+            normalizedDescription === undefined
+              ? ""
+              : String(normalizedDescription),
+        };
+      }
+    }
+
+    if (Object.keys(piedraUpdates).length > 0) {
+      const { error: updatePiedraError } = await supabase
+        .from("piedras")
+        .update(piedraUpdates)
+        .eq("id", piedraId);
+
+      if (updatePiedraError) {
+        throw new Error(`Error al actualizar la piedra: ${updatePiedraError.message}`);
+      }
+    }
+
+    const productPayload = piedraData.productos || piedraData.producto;
+    const allowedProductFields = ["nombre", "precio", "imagen", "categoria_id", "stock"];
+    const productUpdates = {};
+
+    if (productPayload && typeof productPayload === "object") {
+      for (const field of allowedProductFields) {
+        if (productPayload[field] !== undefined) {
+          productUpdates[field] = productPayload[field];
+        }
+      }
+
+      if (productPayload.categorias?.id !== undefined) {
+        productUpdates.categoria_id = productPayload.categorias.id;
+      }
+    }
+
+    const resolvedProductId =
+      piedraUpdates.producto_id ?? productPayload?.id ?? existingPiedra.producto_id;
+
+    if (Object.keys(productUpdates).length > 0) {
+      if (!resolvedProductId) {
+        throw new Error(
+          "No se encontró producto_id para actualizar los datos del producto.",
+        );
+      }
+
+      const { error: updateProductError } = await supabase
+        .from("productos")
+        .update(productUpdates)
+        .eq("id", resolvedProductId);
+
+      if (updateProductError) {
+        throw new Error(`Error al actualizar el producto: ${updateProductError.message}`);
+      }
+    }
+
+    const { data: updatedPiedra, error: updatedPiedraError } = await supabase
+      .from("piedras")
+      .select(
+        "id, descripcion, esPiedraSuelta, producto_id, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+      )
+      .eq("id", piedraId)
+      .maybeSingle();
+
+    if (updatedPiedraError) {
+      throw new Error(`Error al obtener la piedra actualizada: ${updatedPiedraError.message}`);
+    }
+
+    return updatedPiedra;
+  }
 }

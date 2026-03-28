@@ -10,4 +10,17 @@ export default class HerbicidaController {
       throw new Error(`Error al crear el herbicida: ${error.message}`);
     }
   }
+
+  async updateHerbicidaById(herbicidaId, herbicidaData) {
+    try {
+      const herbicidaModel = new HerbicidaModel();
+      const updatedHerbicide = await herbicidaModel.updateHerbicidaById(
+        herbicidaId,
+        herbicidaData,
+      );
+      return updatedHerbicide;
+    } catch (error) {
+      throw new Error(`Error al actualizar el herbicida: ${error.message}`);
+    }
+  }
 }

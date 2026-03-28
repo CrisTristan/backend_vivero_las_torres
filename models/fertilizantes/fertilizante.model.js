@@ -66,4 +66,114 @@ export default class FertilizanteModel {
 
     return createdFertilizer;
   }
+
+  async updateFertilizanteById(fertilizanteId, fertilizanteData) {
+    const { data: existingFertilizante, error: existingFertilizanteError } = await supabase
+      .from("fertilizantes")
+      .select("id, producto_id")
+      .eq("id", fertilizanteId)
+      .maybeSingle();
+
+    if (existingFertilizanteError) {
+      throw new Error(
+        `Error al obtener el fertilizante: ${existingFertilizanteError.message}`,
+      );
+    }
+
+    if (!existingFertilizante) {
+      return null;
+    }
+
+    const allowedFertilizanteFields = ["descripcion", "producto_id"];
+    const fertilizanteUpdates = {};
+
+    for (const field of allowedFertilizanteFields) {
+      if (fertilizanteData[field] !== undefined) {
+        fertilizanteUpdates[field] = fertilizanteData[field];
+      }
+    }
+
+    if (fertilizanteUpdates.descripcion !== undefined) {
+      if (typeof fertilizanteUpdates.descripcion === "string") {
+        fertilizanteUpdates.descripcion = {
+          descripcion: fertilizanteUpdates.descripcion,
+        };
+      } else if (typeof fertilizanteUpdates.descripcion === "object") {
+        const normalizedDescription = fertilizanteUpdates.descripcion?.descripcion;
+        fertilizanteUpdates.descripcion = {
+          descripcion:
+            normalizedDescription === undefined
+              ? ""
+              : String(normalizedDescription),
+        };
+      }
+    }
+
+    if (Object.keys(fertilizanteUpdates).length > 0) {
+      const { error: updateFertilizanteError } = await supabase
+        .from("fertilizantes")
+        .update(fertilizanteUpdates)
+        .eq("id", fertilizanteId);
+
+      if (updateFertilizanteError) {
+        throw new Error(
+          `Error al actualizar el fertilizante: ${updateFertilizanteError.message}`,
+        );
+      }
+    }
+
+    const productPayload = fertilizanteData.productos || fertilizanteData.producto;
+    const allowedProductFields = ["nombre", "precio", "imagen", "categoria_id", "stock"];
+    const productUpdates = {};
+
+    if (productPayload && typeof productPayload === "object") {
+      for (const field of allowedProductFields) {
+        if (productPayload[field] !== undefined) {
+          productUpdates[field] = productPayload[field];
+        }
+      }
+
+      if (productPayload.categorias?.id !== undefined) {
+        productUpdates.categoria_id = productPayload.categorias.id;
+      }
+    }
+
+    const resolvedProductId =
+      fertilizanteUpdates.producto_id ??
+      productPayload?.id ??
+      existingFertilizante.producto_id;
+
+    if (Object.keys(productUpdates).length > 0) {
+      if (!resolvedProductId) {
+        throw new Error(
+          "No se encontró producto_id para actualizar los datos del producto.",
+        );
+      }
+
+      const { error: updateProductError } = await supabase
+        .from("productos")
+        .update(productUpdates)
+        .eq("id", resolvedProductId);
+
+      if (updateProductError) {
+        throw new Error(`Error al actualizar el producto: ${updateProductError.message}`);
+      }
+    }
+
+    const { data: updatedFertilizante, error: updatedFertilizanteError } = await supabase
+      .from("fertilizantes")
+      .select(
+        "id, descripcion, producto_id, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+      )
+      .eq("id", fertilizanteId)
+      .maybeSingle();
+
+    if (updatedFertilizanteError) {
+      throw new Error(
+        `Error al obtener el fertilizante actualizado: ${updatedFertilizanteError.message}`,
+      );
+    }
+
+    return updatedFertilizante;
+  }
 }

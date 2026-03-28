@@ -66,4 +66,106 @@ export default class MacetaModel {
 
     return createdPot;
   }
+
+  async updateMacetaById(macetaId, macetaData) {
+    const { data: existingMaceta, error: existingMacetaError } = await supabase
+      .from("macetas")
+      .select("id, producto_id")
+      .eq("id", macetaId)
+      .maybeSingle();
+
+    if (existingMacetaError) {
+      throw new Error(`Error al obtener la maceta: ${existingMacetaError.message}`);
+    }
+
+    if (!existingMaceta) {
+      return null;
+    }
+
+    const allowedMacetaFields = ["descripcion", "producto_id"];
+    const macetaUpdates = {};
+
+    for (const field of allowedMacetaFields) {
+      if (macetaData[field] !== undefined) {
+        macetaUpdates[field] = macetaData[field];
+      }
+    }
+
+    if (macetaUpdates.descripcion !== undefined) {
+      if (typeof macetaUpdates.descripcion === "string") {
+        macetaUpdates.descripcion = { descripcion: macetaUpdates.descripcion };
+      } else if (typeof macetaUpdates.descripcion === "object") {
+        const normalizedDescription = macetaUpdates.descripcion?.descripcion;
+        macetaUpdates.descripcion = {
+          descripcion:
+            normalizedDescription === undefined
+              ? ""
+              : String(normalizedDescription),
+        };
+      }
+    }
+
+    if (Object.keys(macetaUpdates).length > 0) {
+      const { error: updateMacetaError } = await supabase
+        .from("macetas")
+        .update(macetaUpdates)
+        .eq("id", macetaId);
+
+      if (updateMacetaError) {
+        throw new Error(`Error al actualizar la maceta: ${updateMacetaError.message}`);
+      }
+    }
+
+    const productPayload = macetaData.productos || macetaData.producto;
+    const allowedProductFields = ["nombre", "precio", "imagen", "categoria_id", "stock"];
+    const productUpdates = {};
+
+    if (productPayload && typeof productPayload === "object") {
+      for (const field of allowedProductFields) {
+        if (productPayload[field] !== undefined) {
+          productUpdates[field] = productPayload[field];
+        }
+      }
+
+      if (productPayload.categorias?.id !== undefined) {
+        productUpdates.categoria_id = productPayload.categorias.id;
+      }
+    }
+
+    const resolvedProductId =
+      macetaUpdates.producto_id ?? productPayload?.id ?? existingMaceta.producto_id;
+
+    if (Object.keys(productUpdates).length > 0) {
+      if (!resolvedProductId) {
+        throw new Error(
+          "No se encontró producto_id para actualizar los datos del producto.",
+        );
+      }
+
+      const { error: updateProductError } = await supabase
+        .from("productos")
+        .update(productUpdates)
+        .eq("id", resolvedProductId);
+
+      if (updateProductError) {
+        throw new Error(`Error al actualizar el producto: ${updateProductError.message}`);
+      }
+    }
+
+    const { data: updatedMaceta, error: updatedMacetaError } = await supabase
+      .from("macetas")
+      .select(
+        "id, descripcion, producto_id, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+      )
+      .eq("id", macetaId)
+      .maybeSingle();
+
+    if (updatedMacetaError) {
+      throw new Error(
+        `Error al obtener la maceta actualizada: ${updatedMacetaError.message}`,
+      );
+    }
+
+    return updatedMaceta;
+  }
 }

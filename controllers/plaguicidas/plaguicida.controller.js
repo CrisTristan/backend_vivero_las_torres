@@ -10,4 +10,17 @@ export default class PlaguicidaController {
       throw new Error(`Error al crear el plaguicida: ${error.message}`);
     }
   }
+
+  async updatePlaguicidaById(plaguicidaId, plaguicidaData) {
+    try {
+      const plaguicidaModel = new PlaguicidaModel();
+      const updatedPesticide = await plaguicidaModel.updatePlaguicidaById(
+        plaguicidaId,
+        plaguicidaData,
+      );
+      return updatedPesticide;
+    } catch (error) {
+      throw new Error(`Error al actualizar el plaguicida: ${error.message}`);
+    }
+  }
 }

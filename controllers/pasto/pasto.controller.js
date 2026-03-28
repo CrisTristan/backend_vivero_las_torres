@@ -10,4 +10,15 @@ export default class PastoController {
       throw new Error(`Error al crear el pasto: ${error.message}`);
     }
   }
+
+  async updatePastoById(pastoId, pastoData) {
+    console.log("PastoController - updatePastoById called with:", pastoId, pastoData);
+    try {
+      const pastoModel = new PastoModel();
+      const updatedGrass = await pastoModel.updatePastoById(pastoId, pastoData);
+      return updatedGrass;
+    } catch (error) {
+      throw new Error(`Error al actualizar el pasto: ${error.message}`);
+    }
+  }
 }
