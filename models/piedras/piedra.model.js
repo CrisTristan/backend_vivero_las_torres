@@ -101,7 +101,7 @@ export default class PiedraModel {
       return null;
     }
 
-    const allowedPiedraFields = ["descripcion", "producto_id", "esPiedraSuelta"];
+    const allowedPiedraFields = ["descripcion", "producto_id", "esPiedraSuelta", "tipo"];
     const piedraUpdates = {};
 
     for (const field of allowedPiedraFields) {

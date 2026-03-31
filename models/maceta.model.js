@@ -100,7 +100,7 @@ export default class MacetaModel {
       return null;
     }
 
-    const allowedMacetaFields = ["descripcion", "producto_id"];
+    const allowedMacetaFields = ["descripcion", "producto_id", "tipo"];
     const macetaUpdates = {};
 
     for (const field of allowedMacetaFields) {

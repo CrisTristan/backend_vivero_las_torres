@@ -100,7 +100,7 @@ export default class TierraModel {
       return null;
     }
 
-    const allowedTierraFields = ["descripcion", "producto_id"];
+    const allowedTierraFields = ["descripcion", "producto_id", "tipo"];
     const tierraUpdates = {};
 
     for (const field of allowedTierraFields) {

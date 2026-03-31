@@ -31,6 +31,8 @@ import createNewSoilRouter from './routes/tierra/createNewSoil.js';
 import updateTierraByIdRouter from './routes/tierra/updateTierraById.js';
 import deleteTierraByIdRouter from './routes/tierra/deleteTierraById.js';
 import uploadImageCloudRouter from './routes/images/uploadImageCloud.js';
+import getAllOrdersProductsRouter from './routes/OrdenesUsuarioProductos/getAllOrdersProducts.js';
+import updateOrderStatusAndDeliveryDateByIdRouter from './routes/ordenes/updateOrderStatusAndDeliveryDateById.js';
 import {
   signAccessToken,
   signRefreshToken,
@@ -69,7 +71,8 @@ app.use(createNewSoilRouter);
 app.use(updateTierraByIdRouter);
 app.use(deleteTierraByIdRouter);
 app.use(uploadImageCloudRouter);
-
+app.use(getAllOrdersProductsRouter);
+app.use(updateOrderStatusAndDeliveryDateByIdRouter);
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
 if (!stripeSecretKey) {
@@ -185,7 +188,7 @@ app.post('/createOrder', async (req, res) => {
     // Guardar los productos de la orden
     const savedProducts = [];
     for (const producto of productos) {
-      const orderProduct = new OrderProductsController(newOrder.id, producto.producto_id, producto.cantidad);
+      const orderProduct = new OrderProductsController(newOrder.id, producto.producto_id, producto.cantidad, producto.precio_unitario);
       const savedProduct = await orderProduct.createOrderProducts();
       savedProducts.push(savedProduct);
     }

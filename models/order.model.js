@@ -38,4 +38,36 @@ export default class OrderModel {
       }
       return data;
     }
+
+    //Se actualiza el estado, y Entregado_El_Dia, para saber cuando se entrego la orden, y asi poder eliminar el arreglo personalizado del usuario.
+    async updateStatusAndDeliverDateInOrderById(orderId, payload) {
+        const { data: existingOrder, error: fetchError } = await supabase
+            .from("ordenes")
+            .select("*")
+            .eq("id", orderId)
+            .maybeSingle();
+        if (fetchError) {
+            throw new Error(`Error al obtener la orden: ${fetchError.message}`);
+        }
+        if (!existingOrder) {
+            return null;
+        }
+        const allowedFields = ["estado", "Entregado_El_Dia"];
+        const orderUpdates = {};
+        for (const field of allowedFields) {
+            if (payload[field] !== undefined) {
+                orderUpdates[field] = payload[field];
+            }
+        }
+        const { data: updatedOrder, error: updateError } = await supabase
+            .from("ordenes")
+            .update(orderUpdates)
+            .eq("id", orderId)
+            .select()
+            .maybeSingle();
+        if (updateError) {
+            throw new Error(`Error al actualizar la orden: ${updateError.message}`);
+        }
+        return updatedOrder;
+    }
 }

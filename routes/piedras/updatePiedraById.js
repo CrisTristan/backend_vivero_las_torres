@@ -4,6 +4,8 @@ import PiedraController from "../../controllers/piedras/piedra.controller.js";
 const router = Router();
 
 router.put("/piedras/updatePiedraById/:id", async (req, res) => {
+  console.log("Received request to update piedra with id:", req.params.id);
+  console.log("Request body:", req.body);
   try {
     const piedraId = Number.parseInt(req.params.id, 10);
 

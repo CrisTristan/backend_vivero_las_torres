@@ -29,4 +29,14 @@ export default class OrderController {
             throw new Error(`Error al obtener las órdenes del usuario: ${error.message}`);
         }
     }
+
+    async updateOrderStatusAndDeliverDateById(orderId, payload) {
+        try {
+            const order = new OrderModel();
+            const updatedOrder = await order.updateStatusAndDeliverDateInOrderById(orderId, payload);
+            return updatedOrder;
+        } catch (error) {
+            throw new Error(`Error al actualizar el estado y fecha de entrega de la orden: ${error.message}`);
+        }
+    }
 }

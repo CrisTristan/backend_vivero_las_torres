@@ -1,10 +1,11 @@
 import { supabase } from "../database/supaBaseConnection.js";
 
 export default class OrderProductsModel {
-  constructor(orden_id, product_id, cantidad) {
+  constructor(orden_id, product_id, cantidad, precio_unitario) {
     this.orden_id = orden_id;
     this.product_id = product_id;
     this.cantidad = cantidad;
+    this.precio_unitario = precio_unitario;
   }
 
   async createOrderProducts() {
@@ -15,6 +16,7 @@ export default class OrderProductsModel {
           orden_id: this.orden_id,
           producto_id: this.product_id,
           cantidad: this.cantidad,
+          precio_unitario: this.precio_unitario,
         },
       ])
       .select();
@@ -50,6 +52,22 @@ export default class OrderProductsModel {
       )
       .in("orden_id", orderIds);
 
+    if (error) {
+      throw new Error(
+        `Error al obtener los productos de la orden: ${error.message}`,
+      );
+    }
+    return data;
+  }
+
+  // Método para obtener todos los productos de las órdenes, sin filtrar por usuario
+  async getAllOrdersProducts() {
+    //Si las ordenes son demaciadas, se puede agregar paginación o filtros para limitar la cantidad de datos retornados
+    const { data, error } = await supabase
+      .from("ordenesProductos")
+      .select(
+        `*, producto:productos(imagen, nombre), orden:ordenes(total, fecha, estado, Entregado_El_Dia, es_arreglo_personalizado, usuario:usuarios(nombre, apellidos, telefono))`,
+      );
     if (error) {
       throw new Error(
         `Error al obtener los productos de la orden: ${error.message}`,
