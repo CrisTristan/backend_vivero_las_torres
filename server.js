@@ -33,6 +33,9 @@ import deleteTierraByIdRouter from './routes/tierra/deleteTierraById.js';
 import uploadImageCloudRouter from './routes/images/uploadImageCloud.js';
 import getAllOrdersProductsRouter from './routes/OrdenesUsuarioProductos/getAllOrdersProducts.js';
 import updateOrderStatusAndDeliveryDateByIdRouter from './routes/ordenes/updateOrderStatusAndDeliveryDateById.js';
+import createUserShippingDataByIdRouter from './routes/direcciones_usuario/createUserShippingDataByUserId.js';
+import getUserShippingDataByUserIdRouter from './routes/direcciones_usuario/getUserShippingDataByUserId.js';
+import updateUserShippingDataByIdRouter from './routes/direcciones_usuario/updateUserShippingDataById.js';
 import {
   signAccessToken,
   signRefreshToken,
@@ -73,6 +76,9 @@ app.use(deleteTierraByIdRouter);
 app.use(uploadImageCloudRouter);
 app.use(getAllOrdersProductsRouter);
 app.use(updateOrderStatusAndDeliveryDateByIdRouter);
+app.use(createUserShippingDataByIdRouter);
+app.use(getUserShippingDataByUserIdRouter);
+app.use(updateUserShippingDataByIdRouter);
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
 if (!stripeSecretKey) {

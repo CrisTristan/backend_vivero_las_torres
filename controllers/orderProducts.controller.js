@@ -61,7 +61,7 @@ export default class OrderProductsController {
           id: item.id,
           producto_id: item.producto_id,
           cantidad: item.cantidad,
-          producto: { ...item.producto, precio: item.precio_unitario,}
+          producto: { ...item.producto, precio_unitario: item.precio_unitario,}
         });
 
         return acc;
