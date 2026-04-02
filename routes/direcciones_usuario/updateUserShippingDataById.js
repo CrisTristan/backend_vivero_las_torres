@@ -8,12 +8,10 @@ router.put(
     try {
       const id = Number.parseInt(req.params.id, 10);
       if (Number.isNaN(id)) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "El id de los datos de envío del usuario debe ser un numero valido",
-          });
+        return res.status(400).json({
+          error:
+            "El id de los datos de envío del usuario debe ser un numero valido",
+        });
       }
       const {
         region,
@@ -40,19 +38,36 @@ router.put(
           referencia,
         });
       if (!updatedUserShippingData) {
-        return res
-          .status(404)
-          .json({
-            message:
-              "No se encontraron datos de envío para el usuario con el id proporcionado",
-          });
-      }
-      res
-        .status(200)
-        .json({
-          message: "Datos de envío del usuario actualizados exitosamente",
-          data: updatedUserShippingData,
+        return res.status(404).json({
+          message:
+            "No se encontraron datos de envío para el usuario con el id proporcionado",
         });
+      }
+
+      console.log(
+        "Datos de envío del usuario actualizados:",
+        updatedUserShippingData,
+      );
+
+      const normalizedUserShippingData = updatedUserShippingData.map((data) => {
+        return {
+          id: data.id,
+          region: data["region/supermanzana"],
+          manzana: data.manzana,
+          lote: data.lote,
+          colonia: data["colonia/fraccionamiento"],
+          calle: data.calle,
+          numero_interior: data.numero_interior,
+          numero_exterior: data.numero_exterior,
+          codigo_postal: data.codigo_postal,
+          referencia: data.referencia,
+        };
+      });
+
+      res.status(200).json({
+        message: "Datos de envío del usuario actualizados exitosamente",
+        data: normalizedUserShippingData,
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

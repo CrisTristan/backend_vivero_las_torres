@@ -36,7 +36,20 @@ router.post("/direcciones_usuario/createUserShippingDataByUserId/:usuario_id", a
             codigo_postal,
             referencia
         });
-        res.status(201).json({ message: "Datos de envío del usuario creados exitosamente", data: newUserShippingData });
+        const normalizedData = newUserShippingData.map(item => ({
+            id: item.id,
+            usuario_id: item.usuario_id,
+            region: item["region/supermanzana"],
+            manzana: item.manzana,
+            lote: item.lote,
+            colonia: item["colonia/fraccionamiento"],
+            calle: item.calle,
+            numero_interior: item.numero_interior,
+            numero_exterior: item.numero_exterior,
+            codigo_postal: item.codigo_postal,
+            referencia: item.referencia
+        }));
+        res.status(201).json({ message: "Datos de envío del usuario creados exitosamente", data: normalizedData });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

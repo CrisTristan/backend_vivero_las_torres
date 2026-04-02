@@ -104,4 +104,20 @@ export default class UserShippingDataModel {
         }
 
     }
+
+    async deleteUserShippingDataById(id) {
+        try {
+            console.log("Eliminando datos de envío del usuario con id:", id);
+            const { data, error } = await supabase
+                .from("direcciones_usuario")
+                .delete()
+                .eq("id", id)
+                .select();
+            if (error) throw error;
+            console.log("Datos de envío del usuario eliminados exitosamente:", data);
+            return data;
+        } catch (error) {
+            throw new Error(`Error al eliminar los datos de envío del usuario: ${error.message}`);
+        }
+    }
 }

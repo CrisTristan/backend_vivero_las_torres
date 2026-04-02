@@ -61,4 +61,9 @@ export default class UserShippingDataController {
         });
     }
 
+    async deleteUserShippingDataById(id) {
+        const userShippingDataModel = new UserShippingDataModel();
+        return await userShippingDataModel.deleteUserShippingDataById(id);
+    }
+
 }
