@@ -110,16 +110,30 @@ export default class MacetaModel {
     }
 
     if (macetaUpdates.descripcion !== undefined) {
+      let parsedDescription = macetaUpdates.descripcion;
+
+      // Si viene como string JSON, parsearlo
       if (typeof macetaUpdates.descripcion === "string") {
-        macetaUpdates.descripcion = { descripcion: macetaUpdates.descripcion };
-      } else if (typeof macetaUpdates.descripcion === "object") {
-        const normalizedDescription = macetaUpdates.descripcion?.descripcion;
-        macetaUpdates.descripcion = {
-          descripcion:
-            normalizedDescription === undefined
-              ? ""
-              : String(normalizedDescription),
-        };
+        try {
+          parsedDescription = JSON.parse(macetaUpdates.descripcion);
+        } catch (e) {
+          // Si no es JSON válido, tratar como descripción simple
+          parsedDescription = { descripcion: macetaUpdates.descripcion };
+        }
+      }
+
+      // Asegurar que es un objeto
+      if (typeof parsedDescription === "object" && parsedDescription !== null) {
+        const allowedDescriptionFields = ["descripcion", "volumen", "diametro_superior", "diametro_inferior", "altura"];
+        const normalizedDescription = {};
+
+        for (const field of allowedDescriptionFields) {
+          if (parsedDescription[field] !== undefined) {
+            normalizedDescription[field] = String(parsedDescription[field]);
+          }
+        }
+
+        macetaUpdates.descripcion = normalizedDescription;
       }
     }
 

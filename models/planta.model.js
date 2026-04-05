@@ -190,4 +190,20 @@ export default class PlantaModel {
 
     return updatedPlant;
   }
+
+  async getPlantProductById(plantId) {
+    const { data, error } = await supabase
+      .from("plantas")
+      .select(
+        "id, descripcion, producto_id, tipo, nivel_cuidado, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+      )
+      .eq("id", plantId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error al obtener la planta: ${error.message}`);
+    }
+
+    return data;
+  }
 }

@@ -39,6 +39,7 @@ import updateUserShippingDataByIdRouter from './routes/direcciones_usuario/updat
 import deleteUserShippingDataByIdRouter from './routes/direcciones_usuario/deleteUserShippingDataById.js';
 import createDireccionEnvioByOrderIdRouter from './routes/direcciones_envio/createDireccionEnvioByOrderId.js';
 import getLast10OrdersRouter from './routes/ordenes/getAllOrders.js';
+import password_recoveryRouter from './routes/password_recovery/password_recovery.js';
 import {
   signAccessToken,
   signRefreshToken,
@@ -85,6 +86,7 @@ app.use(updateUserShippingDataByIdRouter);
 app.use(deleteUserShippingDataByIdRouter);
 app.use(createDireccionEnvioByOrderIdRouter);
 app.use(getLast10OrdersRouter);
+app.use(password_recoveryRouter);
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
 if (!stripeSecretKey) {
