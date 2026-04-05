@@ -39,4 +39,14 @@ export default class OrderController {
             throw new Error(`Error al actualizar el estado y fecha de entrega de la orden: ${error.message}`);
         }
     }
+
+    async getLast10Orders() {
+        try {
+            const order = new OrderModel();
+            const last10Orders = await order.getLast10Orders();
+            return last10Orders;
+        } catch (error) {
+            throw new Error(`Error al obtener las últimas 10 órdenes: ${error.message}`);
+        }
+    }
 }

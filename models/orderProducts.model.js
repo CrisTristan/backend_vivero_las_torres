@@ -66,7 +66,7 @@ export default class OrderProductsModel {
     const { data, error } = await supabase
       .from("ordenesProductos")
       .select(
-        `*, producto:productos(imagen, nombre), orden:ordenes(total, fecha, estado, Entregado_El_Dia, es_arreglo_personalizado, usuario:usuarios(nombre, apellidos, telefono))`,
+        `*, producto:productos(imagen, nombre), orden:ordenes(total, fecha, estado, Entregado_El_Dia, es_arreglo_personalizado, usuario:usuarios(nombre, apellidos, telefono), direccion_envio:direcciones_envio(*) ) )`,
       );
     if (error) {
       throw new Error(

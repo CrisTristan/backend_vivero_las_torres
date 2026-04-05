@@ -70,4 +70,17 @@ export default class OrderModel {
         }
         return updatedOrder;
     }
+
+    async getLast10Orders() {
+        const { data, error } = await supabase
+            .from("ordenes")
+            .select("*")
+            .order("fecha", { ascending: false })
+            .limit(10);
+        if (error) {
+            throw new Error(`Error al obtener las últimas 10 órdenes: ${error.message}`);
+        }
+        return data;
+    }
+
 }

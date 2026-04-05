@@ -8,6 +8,32 @@ export default class OrderProductsController {
     this.precio_unitario = precio_unitario;
   }
 
+  normalizeShippingAddress(direccionEnvio) {
+    if (!direccionEnvio) {
+      return null;
+    }
+    return {
+      id: direccionEnvio.id,
+      order_id: direccionEnvio.orden_id,
+      region: direccionEnvio["region/supermanzana"],
+      manzana: direccionEnvio.manzana,
+      lote: direccionEnvio.lote,
+      colonia: direccionEnvio["colonia/fraccionamiento"],
+      calle: direccionEnvio.calle,
+      numero_interior: direccionEnvio.numero_interior,
+      numero_exterior: direccionEnvio.numero_exterior,
+      codigo_postal: direccionEnvio.codigo_postal,
+      referencia: direccionEnvio.referencia,
+    };
+  }
+
+  normalizeShippingAddresses(direccionesEnvio) {
+    if (!direccionesEnvio || direccionesEnvio.length === 0) {
+      return [];
+    }
+    return direccionesEnvio.map(dir => this.normalizeShippingAddress(dir));
+  }
+
   async createOrderProducts() {
     try {
       const orderProducts = new OrderProductsModel(
@@ -51,7 +77,10 @@ export default class OrderProductsController {
         if (!acc[orden_id]) {
           acc[orden_id] = {
             orden_id,
-            orden: item.orden,
+            orden: {
+              ...item.orden,
+              direccion_envio: this.normalizeShippingAddresses(item.orden.direccion_envio)
+            },
             productos: [],
           };
         }
