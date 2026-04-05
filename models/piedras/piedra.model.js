@@ -185,4 +185,20 @@ export default class PiedraModel {
 
     return updatedPiedra;
   }
+
+  async getPiedraProductById(piedraId) {
+    const { data, error } = await supabase
+      .from("piedras")
+      .select(
+        "id, descripcion, esPiedraSuelta, producto_id, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+      )
+      .eq("id", piedraId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error al obtener la piedra: ${error.message}`);
+    }
+
+    return data;
+  }
 }

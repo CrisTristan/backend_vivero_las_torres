@@ -184,4 +184,20 @@ export default class TierraModel {
 
     return updatedTierra;
   }
+
+  async getTierraProductById(tierraId) {
+    const { data, error } = await supabase
+      .from("tierra")
+      .select(
+        "id, descripcion, producto_id, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+      )
+      .eq("id", tierraId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error al obtener la tierra: ${error.message}`);
+    }
+
+    return data;
+  }
 }

@@ -192,4 +192,20 @@ export default class PlaguicidaModel {
 
     return updatedPlaguicida;
   }
+
+  async getPlaguicidaProductById(plaguicidaId) {
+    const { data, error } = await supabase
+      .from("plaguicidas")
+      .select(
+        "id, descripcion, producto_id, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+      )
+      .eq("id", plaguicidaId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error al obtener el plaguicida: ${error.message}`);
+    }
+
+    return data;
+  }
 }

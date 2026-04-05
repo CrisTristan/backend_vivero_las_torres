@@ -194,4 +194,20 @@ export default class FertilizanteModel {
 
     return updatedFertilizante;
   }
+
+  async getFertilizanteProductById(fertilizanteId) {
+    const { data, error } = await supabase
+      .from("fertilizantes")
+      .select(
+        "id, descripcion, producto_id, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+      )
+      .eq("id", fertilizanteId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error al obtener el fertilizante: ${error.message}`);
+    }
+
+    return data;
+  }
 }

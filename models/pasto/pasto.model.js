@@ -184,4 +184,20 @@ export default class PastoModel {
 
     return updatedPasto;
   }
+
+  async getPastoProductById(pastoId) {
+    const { data, error } = await supabase
+      .from("pasto")
+      .select(
+        "id, descripcion, producto_id, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+      )
+      .eq("id", pastoId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error al obtener el pasto: ${error.message}`);
+    }
+
+    return data;
+  }
 }

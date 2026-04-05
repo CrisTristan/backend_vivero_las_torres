@@ -188,4 +188,20 @@ export default class HerbicidaModel {
 
     return updatedHerbicida;
   }
+
+  async getHerbicidaProductById(herbicidaId) {
+    const { data, error } = await supabase
+      .from("herbicidas")
+      .select(
+        "id, descripcion, producto_id, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+      )
+      .eq("id", herbicidaId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error al obtener el herbicida: ${error.message}`);
+    }
+
+    return data;
+  }
 }

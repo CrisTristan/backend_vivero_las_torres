@@ -200,4 +200,20 @@ export default class MacetaModel {
 
     return updatedMaceta;
   }
+
+  async getMacetaProductById(macetaId) {
+    const { data, error } = await supabase
+      .from("macetas")
+      .select(
+        "id, descripcion, producto_id, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+      )
+      .eq("id", macetaId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error al obtener la maceta: ${error.message}`);
+    }
+
+    return data;
+  }
 }
