@@ -18,7 +18,8 @@ export default class PlantaModel {
     if (deletePlantError) throw new Error(`Error al eliminar la planta: ${deletePlantError.message}`);
     // Eliminar el producto relacionado
     if (plant.producto_id) {
-      await supabase.from("productos").delete().eq("id", plant.producto_id);
+      const {data, error} =await supabase.from("productos").delete().eq("id", plant.producto_id);
+      if (error) throw new Error(`Error al eliminar el producto: ${error.message}`);
     }
     return true;
   }

@@ -31,13 +31,13 @@ export default class PastoController {
       const pasto = await this.getPastoById(pastoId);
       if (!pasto) return null;
 
-      if (pasto.productos?.imagen) {
-        const imageDeleteController = new ImageDeleteController();
-        const publicId = this.extractCloudinaryPublicId(pasto.productos.imagen);
-        if (publicId) {
-          await imageDeleteController.deleteImage(publicId);
-        }
-      }
+      // if (pasto.productos?.imagen) {
+      //   const imageDeleteController = new ImageDeleteController();
+      //   const publicId = this.extractCloudinaryPublicId(pasto.productos.imagen);
+      //   if (publicId) {
+      //     await imageDeleteController.deleteImage(publicId);
+      //   }
+      // }
 
       return await pastoModel.deletePastoById(pastoId);
     } catch (error) {

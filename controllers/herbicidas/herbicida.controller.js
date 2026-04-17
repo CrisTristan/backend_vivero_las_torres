@@ -31,13 +31,13 @@ export default class HerbicidaController {
       const herbicida = await this.getHerbicidaById(herbicidaId);
       if (!herbicida) return null;
 
-      if (herbicida.productos?.imagen) {
-        const imageDeleteController = new ImageDeleteController();
-        const publicId = this.extractCloudinaryPublicId(herbicida.productos.imagen);
-        if (publicId) {
-          await imageDeleteController.deleteImage(publicId);
-        }
-      }
+      // if (herbicida.productos?.imagen) {
+      //   const imageDeleteController = new ImageDeleteController();
+      //   const publicId = this.extractCloudinaryPublicId(herbicida.productos.imagen);
+      //   if (publicId) {
+      //     await imageDeleteController.deleteImage(publicId);
+      //   }
+      // }
 
       return await herbicidaModel.deleteHerbicidaById(herbicidaId);
     } catch (error) {

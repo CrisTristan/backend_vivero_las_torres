@@ -31,7 +31,7 @@ import createNewSoilRouter from './routes/tierra/createNewSoil.js';
 import updateTierraByIdRouter from './routes/tierra/updateTierraById.js';
 import deleteTierraByIdRouter from './routes/tierra/deleteTierraById.js';
 import uploadImageCloudRouter from './routes/images/uploadImageCloud.js';
-import getAllOrdersProductsRouter from './routes/OrdenesUsuarioProductos/getAllOrdersProducts.js';
+import getAllOrdersUserProductsRouter from './routes/OrdenesUsuarioProductos/getAllOrdersUserProducts.js';
 import updateOrderStatusAndDeliveryDateByIdRouter from './routes/ordenes/updateOrderStatusAndDeliveryDateById.js';
 import createUserShippingDataByIdRouter from './routes/direcciones_usuario/createUserShippingDataByUserId.js';
 import getUserShippingDataByUserIdRouter from './routes/direcciones_usuario/getUserShippingDataByUserId.js';
@@ -40,6 +40,9 @@ import deleteUserShippingDataByIdRouter from './routes/direcciones_usuario/delet
 import createDireccionEnvioByOrderIdRouter from './routes/direcciones_envio/createDireccionEnvioByOrderId.js';
 import getLast10OrdersRouter from './routes/ordenes/getAllOrders.js';
 import password_recoveryRouter from './routes/password_recovery/password_recovery.js';
+import getTopSellingProductsRouter from './routes/ordenesProductos/getTopSellingProducts.js';
+import getAllOrdersProductsRouter from './routes/ordenesProductos/getAllOrdersProducts.js';
+import reportesPanelAdminRouter from './routes/reportes/reportesPanelAdmin.js';
 import {
   signAccessToken,
   signRefreshToken,
@@ -78,7 +81,7 @@ app.use(createNewSoilRouter);
 app.use(updateTierraByIdRouter);
 app.use(deleteTierraByIdRouter);
 app.use(uploadImageCloudRouter);
-app.use(getAllOrdersProductsRouter);
+app.use(getAllOrdersUserProductsRouter);
 app.use(updateOrderStatusAndDeliveryDateByIdRouter);
 app.use(createUserShippingDataByIdRouter);
 app.use(getUserShippingDataByUserIdRouter);
@@ -87,6 +90,9 @@ app.use(deleteUserShippingDataByIdRouter);
 app.use(createDireccionEnvioByOrderIdRouter);
 app.use(getLast10OrdersRouter);
 app.use(password_recoveryRouter);
+app.use(getTopSellingProductsRouter);
+app.use(getAllOrdersProductsRouter);
+app.use(reportesPanelAdminRouter);
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
 if (!stripeSecretKey) {
@@ -201,8 +207,8 @@ app.post('/createOrder', async (req, res) => {
 
     // Guardar los productos de la orden
     const savedProducts = [];
-    for (const producto of productos) {
-      const orderProduct = new OrderProductsController(newOrder.id, producto.producto_id, producto.cantidad, producto.precio_unitario);
+    for (const producto of productos) {                 //Aqui iba el producto_id, pero como ya no se guarda el producto_id en ordenesProductos, se lo quité del constructor de OrderProductsController y de la creación del nuevo producto de la orden
+      const orderProduct = new OrderProductsController(newOrder.id, producto.producto_id, producto.cantidad, producto.precio_unitario, producto.nombre_producto, producto.imagen_producto);
       const savedProduct = await orderProduct.createOrderProducts();
       savedProducts.push(savedProduct);
     }
@@ -232,7 +238,7 @@ app.get('/getOrdersByUserId', async (req, res) => {
   }
 });
 
-app.get('/getOrdersProductsByUserId',async (req, res) => {
+app.get('/getOrdersProductsByUserId', verifyAccessToken ,async (req, res) => {
   try {
     const { user_id } = req.query;
     if (!user_id) {

@@ -39,12 +39,12 @@ export default class PlantaController {
       }
 
       //Eliminar primero la imagen del producto asociado a la planta
-      if (plant.productos?.imagen) {
-        const imageDeleteController = new ImageDeleteController();
-        const publicId = this.extractCloudinaryPublicId(plant.productos.imagen);
-        console.log('Public ID extraído:', publicId);
-        await imageDeleteController.deleteImage(publicId);
-      }
+      // if (plant.productos?.imagen) {
+      //   const imageDeleteController = new ImageDeleteController();
+      //   const publicId = this.extractCloudinaryPublicId(plant.productos.imagen);
+      //   console.log('Public ID extraído:', publicId);
+      //   await imageDeleteController.deleteImage(publicId);
+      // }
 
 
       return await plantaModel.deletePlantById(plantId);

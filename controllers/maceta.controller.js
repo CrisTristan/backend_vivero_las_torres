@@ -31,19 +31,21 @@ export default class MacetaController {
       const maceta = await this.getMacetaById(macetaId);
       if (!maceta) return null;
 
-      if (maceta.productos?.imagen) {
-        const imageDeleteController = new ImageDeleteController();
-        const publicId = this.extractCloudinaryPublicId(maceta.productos.imagen);
-        if (publicId) {
-          await imageDeleteController.deleteImage(publicId);
-        }
-      }
+      //Esto elimina la imagen del producto asociado a la maceta, si es que existe. Se comenta porque no se está usando Cloudinary para almacenar las imágenes de los productos, sino que se guardan las URLs directamente en la base de datos. Si en el futuro se decide usar Cloudinary, se puede descomentar este bloque y ajustar la lógica según sea necesario.
+      // if (maceta.productos?.imagen) {
+      //   const imageDeleteController = new ImageDeleteController();
+      //   const publicId = this.extractCloudinaryPublicId(maceta.productos.imagen);
+      //   if (publicId) {
+      //     await imageDeleteController.deleteImage(publicId);
+      //   }
+      // }
 
       return await macetaModel.deleteMacetaById(macetaId);
     } catch (error) {
       throw new Error(`Error al eliminar la maceta: ${error.message}`);
     }
   }
+  
   async createNewPot(payload) {
     try {
       const macetaModel = new MacetaModel();

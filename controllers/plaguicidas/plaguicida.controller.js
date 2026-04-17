@@ -31,13 +31,13 @@ export default class PlaguicidaController {
       const plaguicida = await this.getPlaguicidaById(plaguicidaId);
       if (!plaguicida) return null;
 
-      if (plaguicida.productos?.imagen) {
-        const imageDeleteController = new ImageDeleteController();
-        const publicId = this.extractCloudinaryPublicId(plaguicida.productos.imagen);
-        if (publicId) {
-          await imageDeleteController.deleteImage(publicId);
-        }
-      }
+      // if (plaguicida.productos?.imagen) {
+      //   const imageDeleteController = new ImageDeleteController();
+      //   const publicId = this.extractCloudinaryPublicId(plaguicida.productos.imagen);
+      //   if (publicId) {
+      //     await imageDeleteController.deleteImage(publicId);
+      //   }
+      // }
 
       return await plaguicidaModel.deletePlaguicidaById(plaguicidaId);
     } catch (error) {

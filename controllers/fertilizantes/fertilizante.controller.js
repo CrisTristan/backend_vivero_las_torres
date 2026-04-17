@@ -31,13 +31,13 @@ export default class FertilizanteController {
       const fertilizante = await this.getFertilizanteById(fertilizanteId);
       if (!fertilizante) return null;
 
-      if (fertilizante.productos?.imagen) {
-        const imageDeleteController = new ImageDeleteController();
-        const publicId = this.extractCloudinaryPublicId(fertilizante.productos.imagen);
-        if (publicId) {
-          await imageDeleteController.deleteImage(publicId);
-        }
-      }
+      // if (fertilizante.productos?.imagen) {
+      //   const imageDeleteController = new ImageDeleteController();
+      //   const publicId = this.extractCloudinaryPublicId(fertilizante.productos.imagen);
+      //   if (publicId) {
+      //     await imageDeleteController.deleteImage(publicId);
+      //   }
+      // }
 
       return await fertilizanteModel.deleteFertilizanteById(fertilizanteId);
     } catch (error) {

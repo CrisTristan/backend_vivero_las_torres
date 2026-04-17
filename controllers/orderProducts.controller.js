@@ -1,11 +1,13 @@
 import OrderProductsModel from "../models/orderProducts.model.js";
 
 export default class OrderProductsController {
-  constructor(orden_id, product_id, cantidad, precio_unitario) {
+  constructor(orden_id, product_id, cantidad, precio_unitario, nombre_producto, imagen_producto) {
     this.orden_id = orden_id;
     this.product_id = product_id;
     this.cantidad = cantidad;
     this.precio_unitario = precio_unitario;
+    this.nombre_producto = nombre_producto;
+    this.imagen_producto = imagen_producto;
   }
 
   normalizeShippingAddress(direccionEnvio) {
@@ -41,6 +43,8 @@ export default class OrderProductsController {
         this.product_id,
         this.cantidad,
         this.precio_unitario,
+        this.nombre_producto,
+        this.imagen_producto
       );
       const newOrderProducts = await orderProducts.createOrderProducts();
       return newOrderProducts;
@@ -68,7 +72,7 @@ export default class OrderProductsController {
   async getAllOrdersUserProducts() {
     try {
       const orderProducts = new OrderProductsModel();
-      const allOrdersProducts = await orderProducts.getAllOrdersProducts();
+      const allOrdersProducts = await orderProducts.getAllOrdersUserProducts();
       // return allOrdersProducts;
       const agrupadas = allOrdersProducts.reduce((acc, item) => {
         const { orden_id } = item;
@@ -90,7 +94,7 @@ export default class OrderProductsController {
           id: item.id,
           producto_id: item.producto_id,
           cantidad: item.cantidad,
-          producto: { ...item.producto, precio_unitario: item.precio_unitario,}
+          producto: { nombre: item.nombre_producto, imagen: item.imagen_producto, precio_unitario: item.precio_unitario },
         });
 
         return acc;
@@ -102,4 +106,31 @@ export default class OrderProductsController {
       );
     }
   }
+
+  async getTopSellingProducts(limit = 5) {
+    try {
+      const orderProducts = new OrderProductsModel();
+      const topSellingProducts = await orderProducts.getTopSellingProducts(limit);
+      return topSellingProducts;
+    } catch (error) {
+      throw new Error(
+        `Error al obtener los productos más vendidos: ${error.message}`,
+      );
+    }
+  }
+
+  //Regresa un InnerJoin entre ordenesProductos y ordenes.
+  async getAllOrdersProducts(){
+    try {
+      const orderProducts = new OrderProductsModel();
+      const allOrdersProducts = await orderProducts.getAllOrdersProducts();
+      return allOrdersProducts;
+    } catch (error) {
+      throw new Error(
+        `Error al obtener todos los productos de las órdenes: ${error.message}`,
+      );
+    }
+    return allOrdersProducts;
+  }
+
 }

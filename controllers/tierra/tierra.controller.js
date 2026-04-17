@@ -31,13 +31,13 @@ export default class TierraController {
       const tierra = await this.getTierraById(tierraId);
       if (!tierra) return null;
 
-      if (tierra.productos?.imagen) {
-        const imageDeleteController = new ImageDeleteController();
-        const publicId = this.extractCloudinaryPublicId(tierra.productos.imagen);
-        if (publicId) {
-          await imageDeleteController.deleteImage(publicId);
-        }
-      }
+      // if (tierra.productos?.imagen) {
+      //   const imageDeleteController = new ImageDeleteController();
+      //   const publicId = this.extractCloudinaryPublicId(tierra.productos.imagen);
+      //   if (publicId) {
+      //     await imageDeleteController.deleteImage(publicId);
+      //   }
+      // }
 
       return await tierraModel.deleteTierraById(tierraId);
     } catch (error) {

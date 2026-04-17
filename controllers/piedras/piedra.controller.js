@@ -31,13 +31,13 @@ export default class PiedraController {
       const piedra = await this.getPiedraById(piedraId);
       if (!piedra) return null;
 
-      if (piedra.productos?.imagen) {
-        const imageDeleteController = new ImageDeleteController();
-        const publicId = this.extractCloudinaryPublicId(piedra.productos.imagen);
-        if (publicId) {
-          await imageDeleteController.deleteImage(publicId);
-        }
-      }
+      // if (piedra.productos?.imagen) {
+      //   const imageDeleteController = new ImageDeleteController();
+      //   const publicId = this.extractCloudinaryPublicId(piedra.productos.imagen);
+      //   if (publicId) {
+      //     await imageDeleteController.deleteImage(publicId);
+      //   }
+      // }
 
       return await piedraModel.deletePiedraById(piedraId);
     } catch (error) {
