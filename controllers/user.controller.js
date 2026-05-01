@@ -9,18 +9,19 @@ function createHttpError(message, statusCode) {
 
 
 export default class UserController{
-    constructor(nombre, apellidos, correo, password) {
+    constructor(nombre, apellidos, correo, password, telefono) {
         this.nombre = nombre;
         this.apellidos = apellidos;
         this.correo = correo;
         this.password = password;
+        this.telefono = telefono;
     }
 
     async createUser() {
         //hashear contraseña antes de guardar
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(this.password, salt);
-        const user = new UserModel(this.nombre, this.apellidos, this.correo, hashedPassword, this.rol_usuario);
+        const user = new UserModel(this.nombre, this.apellidos, this.correo, hashedPassword, this.rol_usuario, this.telefono);
         const data = await user.createUser();
         return data;
     }

@@ -43,6 +43,9 @@ import password_recoveryRouter from './routes/password_recovery/password_recover
 import getTopSellingProductsRouter from './routes/ordenesProductos/getTopSellingProducts.js';
 import getAllOrdersProductsRouter from './routes/ordenesProductos/getAllOrdersProducts.js';
 import reportesPanelAdminRouter from './routes/reportes/reportesPanelAdmin.js';
+import configPanelAdminRouter from './routes/configuracion/configPanelAdmin.js';
+import verifyEmailRouter from './routes/verifyEmail/verifyEmail.js';
+import authRouter from './routes/auth/auth.route.js';
 import {
   signAccessToken,
   signRefreshToken,
@@ -93,6 +96,10 @@ app.use(password_recoveryRouter);
 app.use(getTopSellingProductsRouter);
 app.use(getAllOrdersProductsRouter);
 app.use(reportesPanelAdminRouter);
+app.use(configPanelAdminRouter);
+app.use(verifyEmailRouter);
+//// Rutas de autenticación (registro, login, refresh token, etc.) /////
+app.use(authRouter);
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
 if (!stripeSecretKey) {
@@ -121,36 +128,6 @@ app.post('/create-payment-intent', async (req, res) => {
   }
 });
 
-app.post('/registerUser', async (req, res) => {
-  try {
-    const { nombre, apellidos, telefono, correo, password } = req.body;
-
-    if (!nombre || !apellidos || !telefono || !correo || !password) {
-      return res.status(400).send({ error: 'Todos los campos son obligatorios' });
-    }
-
-    const user = new UserController(nombre, apellidos, correo, password);
-    const data = await user.createUser();
-    const createdUser = Array.isArray(data) ? data[0] : data;
-    console.log("Usuario creado:", createdUser);
-    if (!createdUser) {
-      return res.status(500).json({ error: 'No se pudo crear el usuario' });
-    }
-
-    const accessToken = signAccessToken(createdUser);
-    const refreshToken = signRefreshToken(createdUser);
-
-    return res.status(201).json({
-      user: sanitizeUser(createdUser),
-      accessToken,
-      refreshToken,
-    });
-
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
-});
-
 app.get('/getUserByEmail', async (req, res) => {
   try {
     const { correo } = req.query;
@@ -168,41 +145,20 @@ app.get('/getUserByEmail', async (req, res) => {
   }
 });
 
-app.post('/loginUser', async (req, res) => {
-  try {
-    const { correo, password } = req.body;
-    if (!correo || !password) {
-      return res.status(400).send({ error: 'Correo y contraseña son obligatorios' });
-    }
-    const user = new UserController(null, null, correo, password);
-    const data = await user.login();
-    
-    const accessToken = signAccessToken(data);
-    const refreshToken = signRefreshToken(data);
-
-    return res.json({
-      user: sanitizeUser(data),
-      accessToken,
-      refreshToken,
-    });
-
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).send({ error: error.message });
-  }
-});
-
 app.post('/createOrder', async (req, res) => {
   try {
-    const { usuario_id, total, estado, es_arreglo_personalizado,productos } = req.body;
-    console.log("Datos recibidos para crear orden:", { usuario_id, total, estado, es_arreglo_personalizado, productos });
-    if (!usuario_id || !total || !estado) {
-      return res.status(400).send({ error: 'Todos los campos son obligatorios' });
+    const { usuario_id, total, estado, es_arreglo_personalizado,productos, metodo_entrega } = req.body;
+    console.log("Datos recibidos para crear orden:", { usuario_id, total, estado, es_arreglo_personalizado, productos, metodo_entrega });
+    if (!usuario_id || !total || !estado || !metodo_entrega) {
+      return res.status(400).send({ error: 'Todos los campos son obligatorios (metodo_entrega es requerido)' });
     }
     if(estado !== 'no entregado' && estado !== 'entregado') {
       return res.status(400).send({ error: 'El estado debe ser "no entregado" o "entregado"' });
     }
-    const order = new OrderController(usuario_id, total, null, estado, es_arreglo_personalizado);
+    if(metodo_entrega !== 'recoger' && metodo_entrega !== 'envío') {
+      return res.status(400).send({ error: 'El método de entrega debe ser "recoger" o "envío"' });
+    }
+    const order = new OrderController(usuario_id, total, null, estado, es_arreglo_personalizado, metodo_entrega);
     const newOrder = await order.createOrder();
 
     // Guardar los productos de la orden
@@ -251,70 +207,5 @@ app.get('/getOrdersProductsByUserId', verifyAccessToken ,async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 });
-
-app.post('/refreshToken', async (req, res) => {
-  const { refreshToken } = req.body;
-  if (!refreshToken) {
-    console.warn('[AUTH][REFRESH] Solicitud sin refresh token');
-    return res.status(401).json({ message: 'Refresh token requerido' });
-  }
-
-  try {
-    console.log('[AUTH][REFRESH] Intento de refresh recibido desde el frontend');
-    //verificar el refresh token y obtener el correo del usuario
-    const payload = verifyRefreshToken(refreshToken);
-    console.log(`[AUTH][REFRESH] Token válido para usuario: ${payload.correo}`);
-
-    const userController = new UserController(null, null, payload.correo, null);
-    const user = await userController.getUserByEmail();
-
-    if (!user) {
-      console.warn(`[AUTH][REFRESH] Usuario no encontrado para correo: ${payload.correo}`);
-      return res.status(401).json({ message: 'Usuario inválido' });
-    }
-
-    const newAccessToken = signAccessToken(user);
-    console.log(`[AUTH][REFRESH] Nuevo access token generado para usuario: ${user.correo} de tipo refresh` );
-    return res.json({ accessToken: newAccessToken });
-  } catch (error) {
-    console.error('[AUTH][REFRESH] Error al refrescar token:', error.message);
-    return res.status(401).json({ message: 'Refresh token inválido o expirado' });
-  }
-});
-
-// GET /me - Ruta protegida para obtener información del usuario autenticado
-app.get('/me', verifyAccessToken, async (req, res) => {
-  try {
-    const userController = new UserController(null, null, req.auth?.correo, null);
-    const user = await userController.getUserByEmail();
-
-    if (!user) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
-    }
-
-    return res.json({ user: sanitizeUser(user) });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-});
-
-//verificar el rol del usuario para acceder a rutas administrativas
-//hacer la verificación con el token y el correo guardado en el token para obtener el usuario y verificar su rol
-app.get('/admin', verifyAccessToken, verificarUserRoleAdmin,async (req, res) => {
-  try {
-    const userController = new UserController(null, null, req.auth?.correo, null);
-    const user = await userController.getUserByEmail();
-    
-    if (!user) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
-    }
-    
-    // El rol ya fue verificado por el middleware, no lo hagas de nuevo
-    return res.json({ message: 'Bienvenido, admin!', user: sanitizeUser(user) });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-});
-
 
 app.listen(3000, () => console.log('Servidor en puerto 3000'));

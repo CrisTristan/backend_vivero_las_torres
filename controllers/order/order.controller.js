@@ -2,17 +2,18 @@ import OrderModel from '../../models/order.model.js';
 
 export default class OrderController {
 
-    constructor(user_id, total, fecha, estado, es_arreglo_personalizado) {
+    constructor(user_id, total, fecha, estado, es_arreglo_personalizado, metodo_entrega) {
         this.user_id = user_id;
         this.total = total;
         this.fecha = fecha;
         this.estado = estado;
         this.es_arreglo_personalizado = es_arreglo_personalizado;
+        this.metodo_entrega = metodo_entrega;
     }
 
     async createOrder() {
         try {
-            const order = new OrderModel(this.user_id, this.total, this.fecha, this.estado, this.es_arreglo_personalizado);
+            const order = new OrderModel(this.user_id, this.total, this.fecha, this.estado, this.es_arreglo_personalizado, this.metodo_entrega);
             const newOrder = await order.createOrder();
             return newOrder;
         } catch (error) {

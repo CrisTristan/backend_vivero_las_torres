@@ -17,7 +17,7 @@ export default class EmailController {
     async sendRecoveryEmail(to, recoveryToken) {
         const { data, error } = await this.resend.emails.send({
             from: this.from,
-            to: ['cristian_abad777@outlook.com'],
+            to: [to],
             subject: "Recuperación de contraseña",
             html: `
                 <h1>Recuperación de contraseña</h1>
@@ -26,15 +26,16 @@ export default class EmailController {
                 <a href="${this.FRONTEND_URL}/reset-password?token=${recoveryToken}" target="_blank">Restablecer contraseña</a>
                 <p>Si no has solicitado esta acción, ignora este correo.</p>
             `,
-  text: "Welcome! This email was sent using Resend's Node.js SDK.",
-});
+            text: "Welcome! This email was sent using Resend's Node.js SDK.",
+        });
 
-if (error) {
-  console.error("Error sending email:", error);
-  process.exit(1);
-}
+        if (error) {
+            console.error("Error sending email:", error);
+            throw new Error(error.message);
+        }
 
-console.log("Email sent successfully!");
-console.log("Email ID:", data?.id);
+        console.log("Email sent successfully!");
+        console.log("Email ID:", data?.id);
+        return data;
     }
 }

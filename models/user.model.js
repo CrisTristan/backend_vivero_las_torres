@@ -1,12 +1,13 @@
 import {supabase} from '../database/supaBaseConnection.js';
 
 class UserModel {
-  constructor(nombre, apellidos, correo, password, rol_usuario = 'cliente') {
+  constructor(nombre, apellidos, correo, password, rol_usuario = 'cliente', telefono) {
     this.nombre = nombre;
     this.apellidos = apellidos;
     this.correo = correo;
     this.password = password;
     this.rol_usuario = rol_usuario;
+    this.telefono = telefono;
   }
 
   async createUser() {
@@ -59,6 +60,21 @@ class UserModel {
     }
     return data;
   }
+
+  async getUserEmailStatus() {
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select('correo_verificado')
+      .eq('correo', this.correo)
+      .maybeSingle();
+
+      if(error) {
+        console.log("Error al obtener estado de verificación de correo:", error);
+        throw new Error(error.message);
+      }
+      return data;
+  }
+
 
 }
 

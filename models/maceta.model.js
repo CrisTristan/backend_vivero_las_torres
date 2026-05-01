@@ -20,6 +20,7 @@ export default class MacetaModel {
     return true;
   }
   async createNewPot(payload) {
+    console.log("Creando nueva maceta con payload:", payload);
     const categoriaSeleccionada = payload.categoriaSeleccionada;
     const categoriaId =
       typeof categoriaSeleccionada === "object"
@@ -52,8 +53,14 @@ export default class MacetaModel {
 
     const potData = {
       producto_id: createdProductId,
+      tipo: payload.tipo,
       descripcion: {
         descripcion: payload.descripcion,
+        volumen: payload.volumen,
+        diametro_superior: payload.diametro_superior,
+        diametro_inferior: payload.diametro_inferior,
+        altura: payload.altura,
+        es_jardinera: payload.es_jardinera === true || payload.es_jardinera === "true",
       },
     };
 
@@ -100,7 +107,7 @@ export default class MacetaModel {
       return null;
     }
 
-    const allowedMacetaFields = ["descripcion", "producto_id", "tipo"];
+    const allowedMacetaFields = ["descripcion", "producto_id", "tipo", "es_jardinera"];
     const macetaUpdates = {};
 
     for (const field of allowedMacetaFields) {

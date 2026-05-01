@@ -5,7 +5,7 @@ const router = Router();
 
 router.post("/macetas/createNew", async (req, res) => {
   try {
-    const { nombre, precio, imagen, stock, categoriaSeleccionada, descripcion } = req.body;
+    const { nombre, precio, imagen, stock, categoriaSeleccionada, descripcion, volumen, diametro_superior, diametro_inferior, altura, tipo, es_jardinera } = req.body;
 
     if (!nombre || !descripcion || categoriaSeleccionada == null) {
       return res.status(400).send({
@@ -31,6 +31,12 @@ router.post("/macetas/createNew", async (req, res) => {
       stock: Math.max(0, parsedStock),
       categoriaSeleccionada,
       descripcion: String(descripcion).trim(),
+      volumen: volumen ? String(volumen).trim() : "",
+      diametro_superior: diametro_superior ? String(diametro_superior).trim() : "",
+      diametro_inferior: diametro_inferior ? String(diametro_inferior).trim() : "",
+      altura: altura ? String(altura).trim() : "",
+      tipo: tipo ? String(tipo).trim() : "",
+      es_jardinera: es_jardinera === true || es_jardinera === "true",
     };
 
     const macetaController = new MacetaController();
