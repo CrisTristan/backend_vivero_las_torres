@@ -10,31 +10,31 @@ export default class OrderProductsController {
     this.imagen_producto = imagen_producto;
   }
 
-  normalizeShippingAddress(direccionEnvio) {
-    if (!direccionEnvio) {
-      return null;
-    }
-    return {
-      id: direccionEnvio.id,
-      order_id: direccionEnvio.orden_id,
-      region: direccionEnvio["region/supermanzana"],
-      manzana: direccionEnvio.manzana,
-      lote: direccionEnvio.lote,
-      colonia: direccionEnvio["colonia/fraccionamiento"],
-      calle: direccionEnvio.calle,
-      numero_interior: direccionEnvio.numero_interior,
-      numero_exterior: direccionEnvio.numero_exterior,
-      codigo_postal: direccionEnvio.codigo_postal,
-      referencia: direccionEnvio.referencia,
-    };
-  }
+  // normalizeShippingAddress(direccionEnvio) {
+  //   if (!direccionEnvio) {
+  //     return null;
+  //   }
+  //   return {
+  //     id: direccionEnvio.id,
+  //     order_id: direccionEnvio.orden_id,
+  //     region: direccionEnvio.region,
+  //     manzana: direccionEnvio.manzana,
+  //     lote: direccionEnvio.lote,
+  //     colonia: direccionEnvio.colonia,
+  //     calle: direccionEnvio.calle,
+  //     numero_interior: direccionEnvio.numero_interior,
+  //     numero_exterior: direccionEnvio.numero_exterior,
+  //     codigo_postal: direccionEnvio.codigo_postal,
+  //     referencia: direccionEnvio.referencia,
+  //   };
+  // }
 
-  normalizeShippingAddresses(direccionesEnvio) {
-    if (!direccionesEnvio || direccionesEnvio.length === 0) {
-      return [];
-    }
-    return direccionesEnvio.map(dir => this.normalizeShippingAddress(dir));
-  }
+  // normalizeShippingAddresses(direccionesEnvio) {
+  //   if (!direccionesEnvio || direccionesEnvio.length === 0) {
+  //     return [];
+  //   }
+  //   return direccionesEnvio.map(dir => this.normalizeShippingAddress(dir));
+  // }
 
   async createOrderProducts() {
     try {
@@ -55,6 +55,7 @@ export default class OrderProductsController {
     }
   }
 
+  
   async getOrdersProductsByUserId() {
     try {
       const orderProducts = new OrderProductsModel(this.orden_id);
@@ -83,7 +84,6 @@ export default class OrderProductsController {
             orden_id,
             orden: {
               ...item.orden,
-              direccion_envio: this.normalizeShippingAddresses(item.orden.direccion_envio)
             },
             productos: [],
           };

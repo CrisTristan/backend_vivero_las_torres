@@ -14,12 +14,13 @@ router.post('/plantas/createNew', async (req, res) => {
       tipo,
       nivel_cuidado,
       descripcion,
+      volumen,
     } = req.body;
 
-    if (!nombre || !tipo || !nivel_cuidado || !descripcion || categoriaSeleccionada == null) {
+    if (!nombre || !tipo || !nivel_cuidado || !descripcion || !volumen || categoriaSeleccionada == null) {
       return res.status(400).send({
         error:
-          'nombre, categoriaSeleccionada, tipo, nivel_cuidado y descripcion son obligatorios',
+          'nombre, categoriaSeleccionada, tipo, nivel_cuidado, descripcion y volumen son obligatorios',
       });
     }
 
@@ -43,6 +44,7 @@ router.post('/plantas/createNew', async (req, res) => {
       tipo: String(tipo),
       nivel_cuidado: String(nivel_cuidado).toLowerCase(),
       descripcion: String(descripcion).trim(),
+      volumen: String(volumen).trim(),
     };
 
     const plantaController = new PlantaController();

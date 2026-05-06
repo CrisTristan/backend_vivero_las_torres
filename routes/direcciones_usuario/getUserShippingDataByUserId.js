@@ -20,10 +20,10 @@ router.get("/direcciones_usuario/getUserShippingDataByUserId/:usuario_id", async
         const normalizedData = userShippingData.map(data => {
             return {
                 id: data.id,
-                region: data["region/supermanzana"],
+                region: data.region,
                 manzana: data.manzana,
                 lote: data.lote,
-                colonia: data["colonia/fraccionamiento"],
+                colonia: data.colonia,
                 calle: data.calle,
                 numero_interior: data.numero_interior,
                 numero_exterior: data.numero_exterior,

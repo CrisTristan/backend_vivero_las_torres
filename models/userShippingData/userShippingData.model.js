@@ -24,13 +24,13 @@ export default class UserShippingDataModel {
                         usuario_id,
                         calle : calle,
                         codigo_postal : codigo_postal,
-                        "colonia/fraccionamiento" : colonia,
+                        colonia : colonia,
                         lote : lote,
                         manzana : manzana,
                         numero_exterior : numero_exterior,
                         numero_interior : numero_interior,
                         referencia : referencia,
-                        "region/supermanzana" : region
+                        region : region
                     }
                 ])
                 .select();
@@ -46,7 +46,7 @@ export default class UserShippingDataModel {
         try {
             const { data, error } = await supabase
                 .from("direcciones_usuario")
-                .select('id, "region/supermanzana", manzana, lote, "colonia/fraccionamiento", calle, numero_interior, numero_exterior, codigo_postal, referencia') //seleccionar todos los campos de la tabla direcciones_usuario menos el id y el usuario_id
+                .select('id, region, manzana, lote, colonia, calle, numero_interior, numero_exterior, codigo_postal, referencia') //seleccionar todos los campos de la tabla direcciones_usuario menos el id y el usuario_id
                 .eq("usuario_id", usuario_id);
             if (error) throw error;
             console.log("Datos de envío del usuario encontrados:", data);
@@ -84,10 +84,10 @@ export default class UserShippingDataModel {
             const { data, error } = await supabase
                 .from("direcciones_usuario")
                 .update({
-                    "region/supermanzana": region,
+                    region: region,
                     manzana: manzana,
                     lote: lote,
-                    "colonia/fraccionamiento": colonia,
+                    colonia: colonia,
                     calle: calle,
                     numero_interior: numero_interior,
                     numero_exterior: numero_exterior,

@@ -37,13 +37,13 @@ export default class DireccionEnvioModel {
                         orden_id: orden_id,
                         calle : calle,
                         codigo_postal : codigo_postal,
-                        "colonia/fraccionamiento" : colonia,
+                        colonia : colonia,
                         lote : lote,
                         manzana : manzana,
                         numero_exterior : numero_exterior,
                         numero_interior : numero_interior,
                         referencia : referencia,
-                        "region/supermanzana" : region
+                        region : region
                     }
                 ])
                 .select();

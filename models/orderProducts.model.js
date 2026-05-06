@@ -33,34 +33,18 @@ export default class OrderProductsModel {
   }
 
   async getOrdersProductsByUserId(userId) {
-    const { data: orders, error: ordersError } = await supabase
-      .from("ordenes")
-      .select("id")
-      .eq("usuario_id", userId);
-
-    if (ordersError) {
-      throw new Error(
-        `Error al obtener las ordenes del usuario: ${ordersError.message}`,
-      );
-    }
-
-    const orderIds = (orders || []).map((order) => order.id);
-    if (orderIds.length === 0) {
-      return [];
-    }
-
-    const { data, error } = await supabase
-      .from("ordenesProductos")
-      .select(
-        `*, orden:ordenes(fecha, estado, Entregado_El_Dia, es_arreglo_personalizado)`,
-      )
-      .in("orden_id", orderIds);
+    
+     const { data, error } = await supabase
+      .rpc('get_ordenes_usuario', {
+        p_usuario_id: userId,
+      });
 
     if (error) {
       throw new Error(
-        `Error al obtener los productos de la orden: ${error.message}`,
+        `Error al obtener las órdenes del usuario: ${error.message}`,
       );
     }
+    
     return data;
   }
 
@@ -71,14 +55,26 @@ export default class OrderProductsModel {
     const { data, error } = await supabase
       .from("ordenesProductos")
       .select(
-        `*, orden:ordenes(total, fecha, estado, Entregado_El_Dia, es_arreglo_personalizado, usuario:usuarios(nombre, apellidos, telefono), direccion_envio:direcciones_envio(*) ) )`,
+        `*, orden:ordenes(total, fecha, estado, Entregado_El_Dia, es_arreglo_personalizado, metodo_entrega, usuario:usuarios(nombre, apellidos, telefono), direccion_envio:direcciones_envio(*) ) )`,
       );
     if (error) {
       throw new Error(
         `Error al obtener los productos de la orden: ${error.message}`,
       );
     }
-    return data;
+    
+    // Normalizar direccion_envio de arreglo a objeto (tomar el primer elemento)
+    const normalizedData = data.map(product => ({
+      ...product,
+      orden: {
+        ...product.orden,
+        direccion_envio: Array.isArray(product.orden.direccion_envio) 
+          ? product.orden.direccion_envio[0] 
+          : product.orden.direccion_envio
+      }
+    }));
+    
+    return normalizedData;
   }
 
   async getTopSellingProducts(limit = 5) {

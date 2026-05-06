@@ -39,10 +39,10 @@ router.post("/direcciones_usuario/createUserShippingDataByUserId/:usuario_id", a
         const normalizedData = newUserShippingData.map(item => ({
             id: item.id,
             usuario_id: item.usuario_id,
-            region: item["region/supermanzana"],
+            region: item.region,
             manzana: item.manzana,
             lote: item.lote,
-            colonia: item["colonia/fraccionamiento"],
+            colonia: item.colonia,
             calle: item.calle,
             numero_interior: item.numero_interior,
             numero_exterior: item.numero_exterior,

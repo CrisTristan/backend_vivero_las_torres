@@ -23,11 +23,12 @@ export default class PlantaModel {
     }
     return true;
   }
+  
   async getAllPlantsWithProducts() {
     const { data, error } = await supabase
       .from("plantas")
       .select(
-        "id, descripcion, producto_id, tipo, nivel_cuidado, producto:productos!inner(id, nombre, precio, imagen, categoria_id, stock)",
+        "id, descripcion, producto_id, tipo, nivel_cuidado, volumen, producto:productos!inner(id, nombre, precio, imagen, categoria_id, stock)",
       );
 
     if (error) {
@@ -72,6 +73,7 @@ export default class PlantaModel {
       producto_id: createdProductId,
       tipo: payload.tipo,
       nivel_cuidado: payload.nivel_cuidado,
+      volumen: payload.volumen,
       descripcion: {
         descripcion: payload.descripcion,
       },
@@ -91,7 +93,7 @@ export default class PlantaModel {
     const { data: createdPlant, error: createdPlantFetchError } = await supabase
       .from("plantas")
       .select(
-        "id, descripcion, producto_id, tipo, nivel_cuidado, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+        "id, descripcion, producto_id, tipo, nivel_cuidado, volumen, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
       )
       .eq("id", createdPlantData.id)
       .maybeSingle();
@@ -125,6 +127,7 @@ export default class PlantaModel {
       "producto_id",
       "tipo",
       "nivel_cuidado",
+      "volumen",
     ];
 
     const plantUpdates = {};
@@ -180,7 +183,7 @@ export default class PlantaModel {
     const { data: updatedPlant, error: updatedPlantError } = await supabase
       .from("plantas")
       .select(
-        "id, descripcion, producto_id, tipo, nivel_cuidado, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+        "id, descripcion, producto_id, tipo, nivel_cuidado, volumen, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
       )
       .eq("id", plantId)
       .maybeSingle();
@@ -196,7 +199,7 @@ export default class PlantaModel {
     const { data, error } = await supabase
       .from("plantas")
       .select(
-        "id, descripcion, producto_id, tipo, nivel_cuidado, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
+        "id, descripcion, producto_id, tipo, nivel_cuidado, volumen, productos:productos!inner(id, nombre, precio, imagen, categoria_id, stock, categorias(categoria, id))",
       )
       .eq("id", plantId)
       .maybeSingle();

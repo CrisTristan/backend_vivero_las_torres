@@ -155,8 +155,8 @@ app.post('/createOrder', async (req, res) => {
     if(estado !== 'no entregado' && estado !== 'entregado') {
       return res.status(400).send({ error: 'El estado debe ser "no entregado" o "entregado"' });
     }
-    if(metodo_entrega !== 'recoger' && metodo_entrega !== 'envío') {
-      return res.status(400).send({ error: 'El método de entrega debe ser "recoger" o "envío"' });
+    if(metodo_entrega !== 'recoger' && metodo_entrega !== 'enviar') {
+      return res.status(400).send({ error: 'El método de entrega debe ser "recoger" o "enviar"' });
     }
     const order = new OrderController(usuario_id, total, null, estado, es_arreglo_personalizado, metodo_entrega);
     const newOrder = await order.createOrder();
