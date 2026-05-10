@@ -1,7 +1,7 @@
 import crypto from 'crypto'; // Para generar tokens aleatorios seguros
 import bcrypt from 'bcrypt'; // Para hashear contraseñas
 import PasswordRecoveryModel from '../../models/password_recovery/password_recovery.model.js';
-import EmailController from '../email/sendRecoveryEmail.controllet.js'; // Controlador para enviar emails
+import EmailController from '../email/sendRecoveryEmail.controller.js'; // Controlador para enviar emails
 
 // Función auxiliar para crear errores HTTP
 function createHttpError(message, statusCode) {

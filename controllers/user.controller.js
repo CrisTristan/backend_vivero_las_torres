@@ -61,4 +61,16 @@ export default class UserController{
         }
         return userData;
     }
+
+    async getAllAdminsWithEmailNotificacionEnabled() {
+        const admins = new UserModel(null, null, null, null);
+        const data = await admins.getAllAdminsWithEmailNotificacionEnabled();
+        return data;
+    }
+
+    async modifyEmailNotificationPreference(userId, permitir_notificaciones_email) {
+        const user = new UserModel(null, null, null, null);
+        const data = await user.modifyEmailNotificationPreference(userId, permitir_notificaciones_email);
+        return data;
+    }
 }

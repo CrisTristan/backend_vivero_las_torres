@@ -1,4 +1,6 @@
 import OrderModel from '../../models/order.model.js';
+import UserController from '../user.controller.js';
+import SendAdminNotificationOrderController from '../email/sendAdminNotificactionOrder.controller.js';
 
 export default class OrderController {
 
@@ -48,6 +50,29 @@ export default class OrderController {
             return last10Orders;
         } catch (error) {
             throw new Error(`Error al obtener las últimas 10 órdenes: ${error.message}`);
+        }
+    }
+
+    // Este método se puede llamar después de crear una nueva orden para notificar a los administradores por correo electrónico.
+    async NotifyAdminsOfNewOrder(orderId) {
+        try {
+            const userController = new UserController();
+            const adminsToNotify = await userController.getAllAdminsWithEmailNotificacionEnabled();
+            console.log("Administradores a notificar por nueva orden:", adminsToNotify);
+            // Enviar correos electrónicos a los administradores
+            for (const admin of adminsToNotify) {
+                try {
+                    const sendAdminNotificationController = new SendAdminNotificationOrderController();
+                    await sendAdminNotificationController.sendAdminNotificationEmail(admin.correo, admin.nombre, admin.apellidos, orderId);
+                    console.log(`Correo enviado a ${admin.correo}`);
+                } catch (emailError) {
+                    console.error(`Error al enviar correo a ${admin.correo}:`, emailError.message);
+                    // Continuar con el siguiente admin sin detener el proceso
+                }
+            }
+        } catch (error) {
+            console.error(`Error al obtener los administradores para notificar: ${error.message}`);
+            // No lanzar error para que no bloquee la creación de la orden
         }
     }
 }

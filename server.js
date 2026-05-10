@@ -46,6 +46,7 @@ import reportesPanelAdminRouter from './routes/reportes/reportesPanelAdmin.js';
 import configPanelAdminRouter from './routes/configuracion/configPanelAdmin.js';
 import verifyEmailRouter from './routes/verifyEmail/verifyEmail.js';
 import authRouter from './routes/auth/auth.route.js';
+import testRouter from './routes/testing/test.js';
 import {
   signAccessToken,
   signRefreshToken,
@@ -98,6 +99,7 @@ app.use(getAllOrdersProductsRouter);
 app.use(reportesPanelAdminRouter);
 app.use(configPanelAdminRouter);
 app.use(verifyEmailRouter);
+app.use(testRouter);
 //// Rutas de autenticación (registro, login, refresh token, etc.) /////
 app.use(authRouter);
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -168,6 +170,9 @@ app.post('/createOrder', async (req, res) => {
       const savedProduct = await orderProduct.createOrderProducts();
       savedProducts.push(savedProduct);
     }
+
+    // Notificar a los administradores por correo electrónico sobre la nueva orden
+    await order.NotifyAdminsOfNewOrder(newOrder.id);
 
     res.status(201).send({
       message: 'Orden creada exitosamente',

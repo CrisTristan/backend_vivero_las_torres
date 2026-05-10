@@ -75,7 +75,33 @@ class UserModel {
       return data;
   }
 
+  async getAllAdminsWithEmailNotificacionEnabled() {
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select('correo, nombre, apellidos')
+      .eq('rol_usuario', 'admin')
+      .eq('permitir_notificaciones_email', true);
+    if (error) {
+      console.log("Error al obtener administradores con notificación de email habilitada:", error);
+      throw new Error(error.message);
+    }
+    return data;
+  }
 
+  async modifyEmailNotificationPreference(userId, enableNotifications) {
+    console.log(`Modificando preferencia de notificación por email para el usuario con ID ${userId} a ${enableNotifications}`);
+    const { data, error } = await supabase
+      .from('usuarios')
+      .update({ permitir_notificaciones_email: enableNotifications })
+      .eq('id', userId)
+      .select('permitir_notificaciones_email')
+      .maybeSingle();
+    if (error) {
+      console.log("Error al modificar la preferencia de notificación por email:", error);
+      throw new Error(error.message);
+    }
+    return data;
+  }
 }
 
 export default UserModel;

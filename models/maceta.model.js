@@ -131,7 +131,7 @@ export default class MacetaModel {
 
       // Asegurar que es un objeto
       if (typeof parsedDescription === "object" && parsedDescription !== null) {
-        const allowedDescriptionFields = ["descripcion", "volumen", "diametro_superior", "diametro_inferior", "altura"];
+        const allowedDescriptionFields = ["descripcion", "diametro_superior", "diametro_inferior", "ancho", "largo", "altura"];
         const normalizedDescription = {};
 
         for (const field of allowedDescriptionFields) {

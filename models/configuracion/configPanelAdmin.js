@@ -4,15 +4,33 @@ export default class ConfigPanelAdminModel {
 
     constructor(){}
 
-    async getAllConfiguration() {
+    async getAllConfiguration(userId) {
         try {
-            const { data, error } = await supabase
+            // Obtener configuración global del panel
+            const { data: configData, error: configError } = await supabase
                 .from("configuracion_panel_admin")
                 .select("*")
+                .eq("id", 1)
                 .single();
-            if (error) throw error;
-            // console.log("Configuración obtenida:", data);
-            return data;
+            
+            if (configError) throw configError;
+
+            // Obtener datos del usuario específico (notificaciones)
+            const { data: userData, error: userError } = await supabase
+                .from("usuarios")
+                .select("permitir_notificaciones_email")
+                .eq("id", userId)
+                .single();
+            
+            if (userError) throw userError;
+
+            // Combinar ambos datos
+            const result = {
+                ...configData,
+                user_configuration: userData
+            };
+
+            return result;
         } catch (error) {
             console.error("Error al obtener la configuración del panel admin:", error);
             throw new Error(`Error al obtener la configuración del panel admin: ${error.message}`);
@@ -31,21 +49,6 @@ export default class ConfigPanelAdminModel {
             return data;
         } catch (error) {
             throw new Error(`Error al actualizar el costo de envío: ${error.message}`);
-        }
-    }
-
-    async updateAllowEmailNotifications(allowEmailNotifications) {
-        try {
-            const { data, error } = await supabase
-                .from("configuracion_panel_admin")
-                .update({ permitir_notificaciones_email: allowEmailNotifications })
-                .eq("id", 1)
-                .select()
-                .single();
-            if (error) throw error;
-            return data;
-        } catch (error) {
-            throw new Error(`Error al actualizar las notificaciones por email: ${error.message}`);
         }
     }
 
