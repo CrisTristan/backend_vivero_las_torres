@@ -57,7 +57,28 @@ import {
 } from './Tokens/JsonWebTokens.js';
 
 const app = express();
-app.use(cors());
+
+// Configurar CORS restrictivo
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || 'http://localhost:4200',
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+app.use(cors(corsOptions));
+
+// Middleware de validación de origen para rutas sensibles
+const validateOrigin = (req, res, next) => {
+  const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:4200';
+  const origin = req.headers.origin;
+  
+  if (origin !== allowedOrigin && process.env.NODE_ENV === 'production') {
+    return res.status(403).json({ error: 'Origen no permitido' });
+  }
+  next();
+};
+
 app.use(express.json());
 app.use(getAllPlantsRouter);
 app.use(createNewPlantRouter);
@@ -110,7 +131,7 @@ if (!stripeSecretKey) {
 
 const stripe = new Stripe(stripeSecretKey);
 
-app.post('/create-payment-intent', async (req, res) => {
+app.post('/create-payment-intent', validateOrigin, async (req, res) => {
   try {
     const { amount} = req.body;
     console.log("Monto recibido para crear PaymentIntent:", amount);
@@ -147,7 +168,7 @@ app.get('/getUserByEmail', async (req, res) => {
   }
 });
 
-app.post('/createOrder', async (req, res) => {
+app.post('/createOrder', validateOrigin, async (req, res) => {
   try {
     const { usuario_id, total, estado, es_arreglo_personalizado,productos, metodo_entrega } = req.body;
     console.log("Datos recibidos para crear orden:", { usuario_id, total, estado, es_arreglo_personalizado, productos, metodo_entrega });

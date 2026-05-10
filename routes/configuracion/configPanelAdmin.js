@@ -3,6 +3,17 @@ import ConfigPanelAdminController from "../../controllers/configuracion/configPa
 
 const router = Router();
 
+// Middleware de validación de origen
+const validateOrigin = (req, res, next) => {
+  const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:4200';
+  const origin = req.headers.origin;
+  
+  if (origin !== allowedOrigin && process.env.NODE_ENV === 'production') {
+    return res.status(403).json({ error: 'Origen no permitido' });
+  }
+  next();
+};
+
 router.get("/configuracion", async (req, res) => {
     const userId = Number.parseInt(req.query.userId);
 
@@ -20,7 +31,7 @@ router.get("/configuracion", async (req, res) => {
 
 });
 
-router.put("/configuracion/costo-envio", async (req, res) => {
+router.put("/configuracion/costo-envio", validateOrigin, async (req, res) => {
     const shippingCost = Number.parseFloat(req.query.shippingCost);
 
     if (Number.isNaN(shippingCost)) {
@@ -37,7 +48,7 @@ router.put("/configuracion/costo-envio", async (req, res) => {
 
 });
 
-router.put("/configuracion/notificaciones-email", async (req, res) => {
+router.put("/configuracion/notificaciones-email", validateOrigin, async (req, res) => {
     const userId = Number.parseInt(req.query.userId);
     const allowEmailNotificationsParam = req.query.allowEmailNotifications;
 
