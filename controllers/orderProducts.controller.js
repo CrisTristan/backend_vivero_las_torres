@@ -74,32 +74,32 @@ export default class OrderProductsController {
     try {
       const orderProducts = new OrderProductsModel();
       const allOrdersProducts = await orderProducts.getAllOrdersUserProducts();
-      // return allOrdersProducts;
-      const agrupadas = allOrdersProducts.reduce((acc, item) => {
-        const { orden_id } = item;
+      return allOrdersProducts;
+      // const agrupadas = allOrdersProducts.reduce((acc, item) => {
+      //   const { orden_id } = item;
 
-        // Si no existe la orden, la creamos
-        if (!acc[orden_id]) {
-          acc[orden_id] = {
-            orden_id,
-            orden: {
-              ...item.orden,
-            },
-            productos: [],
-          };
-        }
+      //   // Si no existe la orden, la creamos
+      //   if (!acc[orden_id]) {
+      //     acc[orden_id] = {
+      //       orden_id,
+      //       orden: {
+      //         ...item.orden,
+      //       },
+      //       productos: [],
+      //     };
+      //   }
 
-        // Agregamos el producto a esa orden
-        acc[orden_id].productos.push({
-          id: item.id,
-          producto_id: item.producto_id,
-          cantidad: item.cantidad,
-          producto: { nombre: item.nombre_producto, imagen: item.imagen_producto, precio_unitario: item.precio_unitario },
-        });
+      //   // Agregamos el producto a esa orden
+      //   acc[orden_id].productos.push({
+      //     id: item.id,
+      //     producto_id: item.producto_id,
+      //     cantidad: item.cantidad,
+      //     producto: { nombre: item.nombre_producto, imagen: item.imagen_producto, precio_unitario: item.precio_unitario },
+      //   });
 
-        return acc;
-      }, {});
-      return Object.values(agrupadas);
+      //   return acc;
+      // }, {});
+      // return Object.values(agrupadas);
     } catch (error) {
       throw new Error(
         `Error al obtener todos los productos de las órdenes: ${error.message}`,

@@ -33,8 +33,8 @@ export default class OrderProductsModel {
   }
 
   async getOrdersProductsByUserId(userId) {
-    
-     const { data, error } = await supabase
+
+    const { data, error } = await supabase
       .rpc('get_ordenes_usuario', {
         p_usuario_id: userId,
       });
@@ -44,7 +44,7 @@ export default class OrderProductsModel {
         `Error al obtener las órdenes del usuario: ${error.message}`,
       );
     }
-    
+
     return data;
   }
 
@@ -53,28 +53,68 @@ export default class OrderProductsModel {
   async getAllOrdersUserProducts() {
     //Si las ordenes son demaciadas, se puede agregar paginación o filtros para limitar la cantidad de datos retornados
     const { data, error } = await supabase
-      .from("ordenesProductos")
-      .select(
-        `*, orden:ordenes(total, fecha, estado, Entregado_El_Dia, es_arreglo_personalizado, metodo_entrega, usuario:usuarios(nombre, apellidos, telefono), direccion_envio:direcciones_envio(*) ) )`,
+      .from("ordenes")
+      .select(`
+    id,
+    total,
+    fecha,
+    estado,
+    Entregado_El_Dia,
+    es_arreglo_personalizado,
+    metodo_entrega,
+
+    usuario:usuarios (
+      id,
+      nombre,
+      apellidos,
+      correo,
+      telefono
+    ),
+
+    direccion_envio:direcciones_envio (
+      id,
+      region,
+      manzana,
+      lote,
+      colonia,
+      calle,
+      numero_interior,
+      numero_exterior,
+      codigo_postal,
+      referencia
+    ),
+
+    productos:ordenesProductos (
+      id,
+      producto_id,
+      nombre_producto,
+      cantidad,
+      precio_unitario,
+      imagen_producto
+    )
+  `)
+      .order("fecha", { descending: true })
+      .limit(20);
+
+    if (error) {
+      throw new Error(
+        `Error al obtener las órdenes: ${error.message}`
       );
+    }
+
+    const ordenes = data.map((orden) => ({
+      ...orden,
+      direccion_envio: orden.direccion_envio?.[0] ?? null,
+    }));
+
+    console.log(data);
     if (error) {
       throw new Error(
         `Error al obtener los productos de la orden: ${error.message}`,
       );
     }
-    
-    // Normalizar direccion_envio de arreglo a objeto (tomar el primer elemento)
-    const normalizedData = data.map(product => ({
-      ...product,
-      orden: {
-        ...product.orden,
-        direccion_envio: Array.isArray(product.orden.direccion_envio) 
-          ? product.orden.direccion_envio[0] 
-          : product.orden.direccion_envio
-      }
-    }));
-    
-    return normalizedData;
+
+    return ordenes;
   }
 
   async getTopSellingProducts(limit = 5) {
@@ -104,7 +144,7 @@ export default class OrderProductsModel {
         `Error al obtener los productos de la orden: ${error.message}`,
       );
     }
-    return data;   
+    return data;
   }
-  
+
 }
