@@ -54,9 +54,9 @@ export default class MacetaModel {
     const potData = {
       producto_id: createdProductId,
       tipo: payload.tipo,
+      volumen: payload.volumen,
       descripcion: {
         descripcion: payload.descripcion,
-        volumen: payload.volumen,
         diametro_superior: payload.diametro_superior,
         diametro_inferior: payload.diametro_inferior,
         altura: payload.altura,
@@ -107,7 +107,7 @@ export default class MacetaModel {
       return null;
     }
 
-    const allowedMacetaFields = ["descripcion", "producto_id", "tipo", "es_jardinera"];
+    const allowedMacetaFields = ["descripcion", "producto_id", "tipo", "es_jardinera", "volumen"];
     const macetaUpdates = {};
 
     for (const field of allowedMacetaFields) {

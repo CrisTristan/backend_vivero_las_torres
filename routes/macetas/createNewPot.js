@@ -5,11 +5,11 @@ const router = Router();
 
 router.post("/macetas/createNew", async (req, res) => {
   try {
-    const { nombre, precio, imagen, stock, categoriaSeleccionada, descripcion, volumen, diametro_superior, diametro_inferior, altura, tipo, es_jardinera } = req.body;
+    const { nombre, precio, imagen, stock, categoriaSeleccionada, volumen, descripcion, diametro_superior, diametro_inferior, altura, tipo, es_jardinera } = req.body;
 
-    if (!nombre || !descripcion || categoriaSeleccionada == null) {
+    if (!nombre || categoriaSeleccionada == null) {
       return res.status(400).send({
-        error: "nombre, categoriaSeleccionada y descripcion son obligatorios",
+        error: "nombre y categoriaSeleccionada son obligatorios",
       });
     }
 
