@@ -20,11 +20,125 @@ export default class EmailController {
             to: [to],
             subject: "Recuperación de contraseña",
             html: `
-                <h1>Recuperación de contraseña</h1>
-                <p>Hola,</p>
-                <p>Has solicitado recuperar tu contraseña. Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
-                <a href="${this.FRONTEND_URL}/reset-password?token=${recoveryToken}" target="_blank">Restablecer contraseña</a>
-                <p>Si no has solicitado esta acción, ignora este correo.</p>
+<div style="margin:0; padding:40px 20px; background-color:#f4f8f2;">
+<!--[if mso]>
+<table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td>
+<![endif]-->
+<table role="presentation" align="center" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; margin:0 auto; background-color:#ffffff; border-radius:18px; font-family:'Segoe UI', Arial, sans-serif;">
+    <tr>
+        <td style="padding:0;">
+
+            <!-- Encabezado -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td align="center" bgcolor="#2d6a4f" style="background-color:#2d6a4f; padding:40px 30px; border-radius:18px 18px 0 0;">
+                        <h1 style="margin:0; color:#ffffff; font-size:32px; font-weight:700; font-family:'Segoe UI', Arial, sans-serif;">
+                            🌿 Vivero Porto Bello
+                        </h1>
+                        <p style="margin-top:10px; color:#ffffff; font-size:16px; font-family:'Segoe UI', Arial, sans-serif;">
+                            Recuperación de contraseña
+                        </p>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Contenido -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="padding:40px 35px; font-family:'Segoe UI', Arial, sans-serif;">
+                        <h2 style="margin-top:0; color:#1b4332; font-size:24px;">
+                            Solicitud de restablecimiento de contraseña
+                        </h2>
+
+                        <p style="color:#555; line-height:1.8; font-size:16px;">
+                            Hemos recibido una solicitud para restablecer la contraseña asociada a tu cuenta de
+                            <strong>Vivero Porto Bello</strong>.
+                        </p>
+
+                        <p style="color:#555; line-height:1.8; font-size:16px;">
+                            Para crear una nueva contraseña, haz clic en el siguiente botón:
+                        </p>
+
+                        <!-- Botón -->
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:35px 0;">
+                            <tr>
+                                <td align="center" bgcolor="#2d6a4f" style="background-color:#2d6a4f; padding:30px 20px; border-radius:14px;">
+                                    <!--[if mso]>
+                                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${this.FRONTEND_URL}/reset-password?token=${recoveryToken}" style="height:52px;v-text-anchor:middle;width:260px;" arcsize="50%" strokecolor="#ffffff" fillcolor="#ffffff">
+                                    <w:anchorlock/>
+                                    <center style="color:#1b4332;font-family:'Segoe UI', Arial, sans-serif;font-size:16px;font-weight:700;">🔒 Restablecer contraseña</center>
+                                    </v:roundrect>
+                                    <![endif]-->
+                                    <!--[if !mso]><!-->
+                                    <a href="${this.FRONTEND_URL}/reset-password?token=${recoveryToken}"
+                                       target="_blank"
+                                       style="
+                                           display:inline-block;
+                                           background-color:#ffffff;
+                                           color:#1b4332;
+                                           text-decoration:none;
+                                           padding:16px 36px;
+                                           border-radius:50px;
+                                           font-size:16px;
+                                           font-weight:700;
+                                           font-family:'Segoe UI', Arial, sans-serif;
+                                       ">
+                                        🔒 Restablecer contraseña
+                                    </a>
+                                    <!--<![endif]-->
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p style="color:#666; font-size:14px; line-height:1.7;">
+                            Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:
+                        </p>
+
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:15px 0;">
+                            <tr>
+                                <td bgcolor="#f8f9fa" style="background-color:#f8f9fa; border:1px solid #e9ecef; border-radius:10px; padding:15px;">
+                                    <p style="margin:0; word-break:break-all; color:#40916c; font-size:13px;">
+                                        ${this.FRONTEND_URL}/reset-password?token=${recoveryToken}
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:30px;">
+                            <tr>
+                                <td bgcolor="#fff8e6" style="background-color:#fff8e6; border-left:4px solid #f4a261; border-radius:6px; padding:15px;">
+                                    <p style="margin:0; color:#6c757d; font-size:14px;">
+                                        ⚠️ Por tu seguridad, este enlace tiene una vigencia limitada.
+                                        Si no solicitaste el cambio de contraseña, puedes ignorar este mensaje y tu cuenta permanecerá segura.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Footer -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td align="center" bgcolor="#f8f9fa" style="background-color:#f8f9fa; padding:25px; border-top:1px solid #e9ecef; border-radius:0 0 18px 18px; font-family:'Segoe UI', Arial, sans-serif;">
+                        <p style="margin:0; color:#6c757d; font-size:13px;">
+                            © ${new Date().getFullYear()} Vivero Porto Bello
+                        </p>
+                        <p style="margin:8px 0 0 0; color:#999; font-size:12px;">
+                            Este es un mensaje automático. Por favor, no respondas a este correo.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+
+        </td>
+    </tr>
+</table>
+<!--[if mso]>
+</td></tr></table>
+<![endif]-->
+</div>
             `,
             text: "Welcome! This email was sent using Resend's Node.js SDK.",
         });

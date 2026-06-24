@@ -1,7 +1,16 @@
 import {supabase} from '../database/supaBaseConnection.js';
+import type {PostgrestError} from '@supabase/supabase-js'
 
 class UserModel {
-  constructor(nombre, apellidos, correo, password, rol_usuario = 'cliente', telefono) {
+
+  nombre: string;
+  apellidos: string;
+  correo: string;
+  password: string;
+  rol_usuario: string;
+  telefono: string;
+
+  constructor(nombre : string, apellidos: string, correo: string, password: string, rol_usuario = 'cliente', telefono: string) {
     this.nombre = nombre;
     this.apellidos = apellidos;
     this.correo = correo;
@@ -27,7 +36,7 @@ class UserModel {
 
     if (error) {
       console.log("Error al crear usuario:", error);
-      throw new Error(error.message);
+      throw error;
     }
 
     return data;

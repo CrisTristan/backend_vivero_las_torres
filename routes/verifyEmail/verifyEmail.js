@@ -29,4 +29,20 @@ router.get("/email-verification/verify", async (req, res) => {
     }
 });
 
+// Endpoint para reenviar el correo de verificación cuando el usuario lo solicite
+router.post("/email-verification/resend", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: "Email es obligatorio" });
+    }
+    const controller = new EmailVerificationController();
+    await controller.saveVerificationToken(userId)
+    return res.status(200).json({ message: "Correo de verificación reenviado" });
+  } catch (error) {
+    console.error('Error al reenviar correo de verificación:', error);
+    return res.status(500).json({ error: "Error al reenviar el correo de verificación" });
+  }
+});
+
 export default router;

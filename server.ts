@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import Stripe from 'stripe';
-import UserController from './controllers/user.controller.js';
+import UserController from './controllers/user.controller.ts';
 import OrderController from './controllers/order/order.controller.js';
 import OrderProductsController from './controllers/orderProducts.controller.js';
 import getAllPlantsRouter from './routes/Plants/getAllPlants.js';
@@ -45,7 +45,7 @@ import getAllOrdersProductsRouter from './routes/ordenesProductos/getAllOrdersPr
 import reportesPanelAdminRouter from './routes/reportes/reportesPanelAdmin.js';
 import configPanelAdminRouter from './routes/configuracion/configPanelAdmin.js';
 import verifyEmailRouter from './routes/verifyEmail/verifyEmail.js';
-import authRouter from './routes/auth/auth.route.js';
+import authRouter from './routes/auth/auth.route.ts';
 import testRouter from './routes/testing/test.js';
 import {
   signAccessToken,

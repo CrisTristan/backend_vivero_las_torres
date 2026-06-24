@@ -9,13 +9,13 @@
     "skipLibCheck": true
   },
   "include": [
-    "server.js",
+    "server.ts",
     "controllers/**/*.js",
     "database/**/*.js",
     "models/**/*.js",
     "routes/**/*.js",
     "Tokens/**/*.js"
-  ],
+, "controllers/user.controller.ts", "models/user.model.ts", "routes/auth/auth.route.ts"  ],
   "exclude": [
     "node_modules"
   ]

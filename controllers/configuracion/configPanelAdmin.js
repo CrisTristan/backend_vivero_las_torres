@@ -1,5 +1,5 @@
 import ConfigPanelAdminModel from "../../models/configuracion/configPanelAdmin.js";
-import UserController from "../user.controller.js";
+import UserController from "../user.controller.ts";
 
 export default class ConfigPanelAdminController {
 

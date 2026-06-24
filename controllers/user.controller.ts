@@ -1,4 +1,4 @@
-import UserModel from '../models/user.model.js';
+import UserModel from '../models/user.model.ts';
 import bcrypt from 'bcrypt';
 
 function createHttpError(message, statusCode) {
@@ -9,7 +9,14 @@ function createHttpError(message, statusCode) {
 
 
 export default class UserController{
-    constructor(nombre, apellidos, correo, password, telefono) {
+
+    nombre: string;
+    apellidos: string;
+    correo: string;
+    password: string;
+    telefono: string;
+
+    constructor(nombre : string, apellidos: string, correo: string, password: string, telefono: string) {
         this.nombre = nombre;
         this.apellidos = apellidos;
         this.correo = correo;
@@ -47,7 +54,7 @@ export default class UserController{
     async login() {
         const userData = await this.getUserByEmail();
         if (!userData) {
-            throw createHttpError('Usuario no encontrado', 404);
+            throw createHttpError('El correo no está registrado', 404);
         }
 
         const userPasswordHashData = await this.getPasswordHashByEmail();

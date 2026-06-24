@@ -37,7 +37,7 @@ export default class EmailVerificationModel {
 
         if (error) {
             console.error("Error al buscar el token de verificación:", error);
-            throw new Error(`Error al buscar el token de verificación: ${error.message}`);
+            throw error;
         }
 
         return data;

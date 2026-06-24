@@ -1,15 +1,16 @@
 import Router from 'express';
-import UserController from '../../controllers/user.controller.js';
+import UserController from '../../controllers/user.controller.ts';
 import EmailVerificationController from '../../controllers/verificarCorreoUsuario/emailVerification.controller.js';
 import sendVerificationEmailController from '../../controllers/email/sendVerificationEmail.controller.js';
-import { 
-    signAccessToken, 
-    signRefreshToken, 
-    sanitizeUser, 
-    verifyAccessToken, 
-    verificarUserRoleAdmin, 
-    verifyRefreshToken 
+import {
+    signAccessToken,
+    signRefreshToken,
+    sanitizeUser,
+    verifyAccessToken,
+    verificarUserRoleAdmin,
+    verifyRefreshToken
 } from '../../Tokens/JsonWebTokens.js';
+import isPostgrestError from '../../Guards/supabase_guard.ts';
 
 const router = Router();
 
@@ -18,16 +19,17 @@ router.post('/auth/registerUser', async (req, res) => {
         const { nombre, apellidos, telefono, correo, password } = req.body;
 
         if (!nombre || !apellidos || !telefono || !correo || !password) {
-            return res.status(400).send({ error: 'Todos los campos son obligatorios' });
+            return res.status(400).send({ error: 'Los Campos de nombre, apellidos, teléfono, correo y password son obligatorios' });
         }
 
         const user = new UserController(nombre, apellidos, correo, password, telefono);
         const data = await user.createUser();
+        console.log("Datos del usuario creado:", data);
         const createdUser = Array.isArray(data) ? data[0] : data;
         console.log("Usuario creado:", createdUser);
-        if (!createdUser) {
-            return res.status(500).json({ error: 'No se pudo crear el usuario' });
-        }
+        // if (!createdUser) {
+        //     return res.status(500).json({ error: 'No se pudo crear el usuario' });
+        // }
 
         const accessToken = signAccessToken(createdUser);
         const refreshToken = signRefreshToken(createdUser);
@@ -36,7 +38,7 @@ router.post('/auth/registerUser', async (req, res) => {
         const emailController = new EmailVerificationController();
         const sendVerificationEmail = new sendVerificationEmailController();
         const verificationToken = await emailController.saveVerificationToken(createdUser.id);
-        await sendVerificationEmail.sendVerificationEmail(correo, verificationToken.verification_token);
+        await sendVerificationEmail.sendVerificationEmail(correo, verificationToken.verification_token, createdUser.nombre);
 
         return res.status(201).json({
             user: sanitizeUser(createdUser),
@@ -44,8 +46,39 @@ router.post('/auth/registerUser', async (req, res) => {
             refreshToken,
         });
 
-    } catch (error) {
-        res.status(500).send({ error: error.message });
+    } catch (error: unknown) {
+
+        if (isPostgrestError(error)) {
+            console.log(error.code);
+            console.log(error.details);
+            console.log(error.hint);
+
+            if(error.details && error.details.includes('correo')) {
+                return res.status(400).json({
+                    error: 'El correo proporcionado ya está en uso. Por favor, utiliza otro correo.'
+                });
+            }
+
+            if(error.details && error.details.includes('telefono')) {
+                return res.status(400).json({
+                    error: 'El teléfono proporcionado ya está en uso. Por favor, utiliza otro teléfono.'
+                });
+            }
+
+            return res.status(400).json({
+                error: error.details
+            });
+        }
+
+        if (error instanceof Error) {
+            return res.status(500).json({
+                error: error.message
+            });
+        }
+
+        return res.status(500).json({
+            error: 'Error desconocido'
+        });
     }
 });
 
@@ -55,7 +88,7 @@ router.post('/auth/loginUser', async (req, res) => {
         if (!correo || !password) {
             return res.status(400).send({ error: 'Correo y contraseña son obligatorios' });
         }
-        const user = new UserController(null, null, correo, password, null);
+        const user = new UserController('', '', correo, password, null);
         const data = await user.login();
 
         const accessToken = signAccessToken(data);
@@ -63,6 +96,7 @@ router.post('/auth/loginUser', async (req, res) => {
 
         //Verificar si el correo del usuario está verificado antes de permitir el login
         if (data.correo_verificado === false) {
+            //Volver a enviar el correo de verificación al usuario
             return res.status(403).json({ error: 'Correo no verificado. Por favor verifica tu correo antes de iniciar sesión.' });
         }
 

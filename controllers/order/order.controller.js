@@ -1,5 +1,5 @@
 import OrderModel from '../../models/order.model.js';
-import UserController from '../user.controller.js';
+import UserController from '../user.controller.ts';
 import SendAdminNotificationOrderController from '../email/sendAdminNotificactionOrder.controller.js';
 
 export default class OrderController {
