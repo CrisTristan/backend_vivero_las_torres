@@ -9,6 +9,11 @@ const from = process.env.EMAIL_FROM || "Acme <onboarding@resend.dev>";
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:4200";
 
 export default class VerifyEmailController {
+
+    resend: Resend;
+    from: string;
+    FRONTEND_URL: string;
+
     constructor() {
         this.resend = resend;
         this.from = from;
@@ -16,7 +21,7 @@ export default class VerifyEmailController {
     }
 
     // Nuevo método para enviar email de verificación de registro
-    async sendVerificationEmail(to, verificationToken, userName = 'Usuario') {
+    async sendVerificationEmail(to : string, verificationToken : string, userName : string = 'Usuario') {
         const verificationLink = `${this.FRONTEND_URL}/email-verification?token=${verificationToken}`;
 
         const { data, error } = await this.resend.emails.send({
@@ -91,20 +96,6 @@ export default class VerifyEmailController {
                                         ✓ Verificar mi correo
                                     </a>
                                     <!--<![endif]-->
-                                </td>
-                            </tr>
-                        </table>
-
-                        <p style="color:#666; font-size:14px; line-height:1.7;">
-                            Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:
-                        </p>
-
-                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:15px 0;">
-                            <tr>
-                                <td bgcolor="#f8f9fa" style="background-color:#f8f9fa; border:1px solid #e9ecef; border-radius:10px; padding:15px;">
-                                    <p style="margin:0; word-break:break-all; color:#40916c; font-size:13px;">
-                                        ${verificationLink}
-                                    </p>
                                 </td>
                             </tr>
                         </table>

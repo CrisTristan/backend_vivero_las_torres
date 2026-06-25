@@ -1,4 +1,4 @@
-import { supabase } from "../database/supaBaseConnection.js";
+import { supabase } from "../database/supaBaseConnection.ts";
 
 export default class OrderProductsModel {
   constructor(orden_id, product_id, cantidad, precio_unitario, nombre_producto, imagen_producto) {

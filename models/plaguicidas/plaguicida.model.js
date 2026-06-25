@@ -1,4 +1,4 @@
-import { supabase } from "../../database/supaBaseConnection.js";
+import { supabase } from "../../database/supaBaseConnection.ts";
 
 export default class PlaguicidaModel {
   async deletePlaguicidaById(plaguicidaId) {

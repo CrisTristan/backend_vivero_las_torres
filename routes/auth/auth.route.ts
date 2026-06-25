@@ -1,7 +1,7 @@
 import Router from 'express';
 import UserController from '../../controllers/user.controller.ts';
-import EmailVerificationController from '../../controllers/verificarCorreoUsuario/emailVerification.controller.js';
-import sendVerificationEmailController from '../../controllers/email/sendVerificationEmail.controller.js';
+import EmailVerificationController from '../../controllers/verificarCorreoUsuario/emailVerification.controller.ts';
+import sendVerificationEmailController from '../../controllers/email/sendVerificationEmail.controller.ts';
 import {
     signAccessToken,
     signRefreshToken,

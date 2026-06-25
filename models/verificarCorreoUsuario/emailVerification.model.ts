@@ -1,10 +1,19 @@
-import { supabase } from "../../database/supaBaseConnection.js";
+import { supabase } from "../../database/supaBaseConnection.ts";
+
+export interface TokenRecord {
+    id: number;
+    created_at: string; // ISO string
+    usuario_id: number;
+    verification_token: string;
+    verification_token_expires_at: string; // ISO string
+    used: boolean;
+}
 
 export default class EmailVerificationModel {
 
     constructor() { }
 
-    async saveVerificationToken(userId, token, expiration) {
+    async saveVerificationToken(userId: number, token: string, expiration: Date): Promise<TokenRecord> {
 
         try {
             const { data, error } = await supabase
@@ -27,7 +36,7 @@ export default class EmailVerificationModel {
         }
     }
 
-    async findValidToken(token) {
+    async findValidToken(token : string) : Promise<TokenRecord> {
         const { data, error } = await supabase
             .from("email_verification_tokens")
             .select("*")
@@ -44,7 +53,7 @@ export default class EmailVerificationModel {
     }
 
     // Marcar un token como utilizado para evitar reutilización
-    async invalidateToken(token) {
+    async invalidateToken(token: string) {
         const { data, error } = await supabase
             .from('email_verification_tokens')
             .update({ used: true })
@@ -58,7 +67,7 @@ export default class EmailVerificationModel {
     }
 
     // Actualizar el estado del usuario a "correo_verificado" en la tabla de usuarios
-    async updateUserEmailStatus(userId) {
+    async updateUserEmailStatus(userId: number) {
         const { data, error } = await supabase
             .from('usuarios')
             .update({ correo_verificado: true })

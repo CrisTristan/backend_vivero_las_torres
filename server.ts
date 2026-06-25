@@ -44,7 +44,7 @@ import getTopSellingProductsRouter from './routes/ordenesProductos/getTopSelling
 import getAllOrdersProductsRouter from './routes/ordenesProductos/getAllOrdersProducts.js';
 import reportesPanelAdminRouter from './routes/reportes/reportesPanelAdmin.js';
 import configPanelAdminRouter from './routes/configuracion/configPanelAdmin.js';
-import verifyEmailRouter from './routes/verifyEmail/verifyEmail.js';
+import verifyEmailRouter from './routes/verifyEmail/verifyEmail.ts';
 import authRouter from './routes/auth/auth.route.ts';
 import testRouter from './routes/testing/test.js';
 import {

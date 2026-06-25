@@ -1,5 +1,6 @@
 import UserModel from '../models/user.model.ts';
 import bcrypt from 'bcrypt';
+import type {UserRecord} from '../models/user.model.ts';
 
 function createHttpError(message, statusCode) {
     const error = new Error(message);
@@ -41,13 +42,19 @@ export default class UserController{
         return data;
     }
 
+    async getUserById(userId: number) : Promise<UserRecord | null> {
+        const user = new UserModel('', '', '', '', '', '');
+        const data = await user.getUserById(userId);
+        return data;
+    }
+
     async getPasswordHashByEmail() {
         const user = new UserModel(null, null, this.correo, null);
         const data = await user.getPasswordHashByEmail();
         return data;
     }
     
-    async verifyPassword(plainPassword, hashedPassword) {
+    async verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
         return await bcrypt.compare(plainPassword, hashedPassword);
     }
 

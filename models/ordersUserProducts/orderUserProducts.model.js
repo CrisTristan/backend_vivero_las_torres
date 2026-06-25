@@ -1,4 +1,4 @@
-import { supabase } from "../../database/supaBaseConnection.js";
+import { supabase } from "../../database/supaBaseConnection.ts";
 
 //este modelo podria servir en un futuro para actualizar las tablas ordenes, ordenesProductos y usuarios.
 export default class OrdersUserProductsModel {

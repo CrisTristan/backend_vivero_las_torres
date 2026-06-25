@@ -1,5 +1,18 @@
-import {supabase} from '../database/supaBaseConnection.js';
+import {supabase} from '../database/supaBaseConnection.ts';
 import type {PostgrestError} from '@supabase/supabase-js'
+
+export interface UserRecord {
+  id: number;
+  nombre: string;
+  apellidos: string;
+  correo: string;
+  password_hashed: string;
+  telefono: string;
+  rol_usuario: string;
+  fechaRegistro: string;
+  correo_verificado: boolean;
+  permitir_notificaciones_email: boolean;
+}
 
 class UserModel {
 
@@ -56,6 +69,20 @@ class UserModel {
     return data;
   }
 
+  async getUserById(userId: number) : Promise<UserRecord | null> {
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if(error) {
+      console.log("Error al obtener usuario por ID:", error);
+      throw new Error(error.message);
+    }
+    return data;
+  }
+
   async getPasswordHashByEmail() {
     const { data, error } = await supabase
       .from('usuarios')
@@ -97,7 +124,7 @@ class UserModel {
     return data;
   }
 
-  async modifyEmailNotificationPreference(userId, enableNotifications) {
+  async modifyEmailNotificationPreference(userId: number, enableNotifications: boolean) {
     console.log(`Modificando preferencia de notificación por email para el usuario con ID ${userId} a ${enableNotifications}`);
     const { data, error } = await supabase
       .from('usuarios')

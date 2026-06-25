@@ -15,7 +15,7 @@
     "models/**/*.js",
     "routes/**/*.js",
     "Tokens/**/*.js"
-, "controllers/user.controller.ts", "models/user.model.ts", "routes/auth/auth.route.ts"  ],
+, "controllers/user.controller.ts", "models/user.model.ts", "routes/auth/auth.route.ts", "routes/verifyEmail/verifyEmail.ts", "controllers/verificarCorreoUsuario/emailVerification.controller.ts", "controllers/email/sendVerificationEmail.controller.ts"  ],
   "exclude": [
     "node_modules"
   ]

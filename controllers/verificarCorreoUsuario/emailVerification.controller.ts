@@ -1,5 +1,13 @@
-import EmailVerificationModel from "../../models/verificarCorreoUsuario/emailVerification.model.js";
+import EmailVerificationModel from "../../models/verificarCorreoUsuario/emailVerification.model.ts";
 import crypto from 'crypto'; // Para generar tokens aleatorios seguros
+import type {PostgrestError} from '@supabase/supabase-js';
+
+export interface TokenValidationResult {
+    valid: boolean;
+    user_id: number | null;
+    message: string;
+    error?: PostgrestError; // Agregar la propiedad error opcional
+}
 
 export default class EmailVerificationController {
 
@@ -11,7 +19,7 @@ export default class EmailVerificationController {
         return crypto.randomBytes(32).toString('hex');
     }
 
-    async saveVerificationToken(userId) {
+    async saveVerificationToken(userId : number) {
         const token = await this.generateVerificationToken();
         const expiration = new Date(Date.now() + 1 * 60 * 60 * 1000); // El token expira en 5 minutos
         const emailVerificationModel = new EmailVerificationModel();
@@ -19,16 +27,11 @@ export default class EmailVerificationController {
     }
 
     // PASO 2: Validar que el token sea válido y no haya expirado
-        async validateToken(token) {
+        async validateToken(token : string) : Promise<TokenValidationResult> {
             try {
                 // Buscar el token en BD
                 const model = new EmailVerificationModel();
                 const tokenRecord = await model.findValidToken(token);
-    
-                // Token no encontrado o ya usado
-                if (!tokenRecord) {
-                    throw createHttpError('Token inválido o ya ha sido utilizado', 400);
-                }
     
                 // Obtener hora actual
                 const now = new Date();
@@ -40,7 +43,12 @@ export default class EmailVerificationController {
                 // Verificar que no ha expirado
                 if (now > expiresAt) {
                     console.log(`[EMAIL VERIFICATION] ⏰ Token EXPIRADO para ${tokenRecord.usuario_id}`);
-                    throw createHttpError('Token expirado. Solicita un nuevo correo de verificación', 400);
+                    //Retornar un objeto indicando que el token ha expirado
+                    return {
+                        valid: false,
+                        user_id: tokenRecord.usuario_id,
+                        message: 'El token ha expirado. Por favor, solicita un nuevo correo de verificación.'
+                    };
                 }
     
                 console.log(`[EMAIL VERIFICATION] ✅ Token VÁLIDO para ${tokenRecord.usuario_id}`);
@@ -58,13 +66,14 @@ export default class EmailVerificationController {
                 return {
                     valid: false,
                     user_id: null,
-                    message: error.message || 'Error al validar el token de verificación'
+                    message: 'Error al validar el token de verificación',
+                    error: error as PostgrestError // Convertir a PostgrestError si es posible
                 };
             }
         }
 
     //Paso 3: Marcar el token como utilizado para evitar reutilización
-    async updateUserEmailStatus(userId, token) {
+    async updateUserEmailStatus(userId : number, token: string) {
         try {
             const model = new EmailVerificationModel();
             await model.updateUserEmailStatus(userId);
